@@ -3,7 +3,6 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "generate:nexus": "ts-node --transpile-only graphql/schema",
     "dev": "next dev",
     "build": "next build",
     "start": "next start"
@@ -15,6 +14,7 @@
     "apollo-resolvers": "^1.4.2",
     "apollo-server": "^2.20.0",
     "apollo-server-micro": "^2.20.0",
+    "bcrypt": "^5.0.0",
     "graphql": "^15.5.0",
     "next": "10.0.6",
     "nexus": "^1.0.0",
