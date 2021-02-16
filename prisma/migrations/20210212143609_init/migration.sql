@@ -1,11 +1,11 @@
-/*
-  Warnings:
+-- CreateTable
+CREATE TABLE "companies" (
+    "id" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
+    "stripeCustomerId" TEXT,
 
-  - You are about to drop the `User` table. If the table is not empty, all the data it contains will be lost.
-
-*/
--- DropForeignKey
-ALTER TABLE "User" DROP CONSTRAINT "User_companyId_fkey";
+    PRIMARY KEY ("id")
+);
 
 -- CreateTable
 CREATE TABLE "accounts" (
@@ -39,14 +39,14 @@ CREATE TABLE "sessions" (
 
 -- CreateTable
 CREATE TABLE "users" (
-    "id" TEXT NOT NULL,
-    "firstName" TEXT,
-    "lastName" TEXT,
+    "id" SERIAL NOT NULL,
+    "name" TEXT,
     "email" TEXT,
     "email_verified" TIMESTAMP(3),
+    "image" TEXT,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "companyId" TEXT NOT NULL,
+    "companyId" TEXT,
 
     PRIMARY KEY ("id")
 );
@@ -62,9 +62,6 @@ CREATE TABLE "verification_requests" (
 
     PRIMARY KEY ("id")
 );
-
--- DropTable
-DROP TABLE "User";
 
 -- CreateIndex
 CREATE UNIQUE INDEX "accounts.compound_id_unique" ON "accounts"("compound_id");
@@ -91,4 +88,4 @@ CREATE UNIQUE INDEX "users.email_unique" ON "users"("email");
 CREATE UNIQUE INDEX "verification_requests.token_unique" ON "verification_requests"("token");
 
 -- AddForeignKey
-ALTER TABLE "users" ADD FOREIGN KEY ("companyId") REFERENCES "Company"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "users" ADD FOREIGN KEY ("companyId") REFERENCES "companies"("id") ON DELETE SET NULL ON UPDATE CASCADE;

@@ -4,9 +4,10 @@ import { ApolloServer } from "apollo-server-micro";
 import { schema } from "../../graphql/schema";
 import { PrismaClient } from "@prisma/client";
 import prisma from "../../lib/prisma";
+import { getSession } from "next-auth/client";
 
 type User = {
-  id: string;
+  id: number;
   username: string;
 };
 
@@ -17,8 +18,13 @@ export interface Context {
 
 const apolloServer = new ApolloServer({
   schema,
-  context: (): Context => {
-    return { prisma };
+  context: async ({ req }): Promise<Context> => {
+    // TODO: Implement Token Based Authentication (API Requests)
+
+    const session = await getSession({ req });
+    const user = session?.user;
+
+    return { prisma, user };
   },
 });
 

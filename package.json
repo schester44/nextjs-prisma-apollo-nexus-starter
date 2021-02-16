@@ -14,8 +14,10 @@
     "apollo-resolvers": "^1.4.2",
     "apollo-server": "^2.20.0",
     "apollo-server-micro": "^2.20.0",
+    "autoprefixer": "^10.2.4",
     "bcrypt": "^5.0.0",
     "graphql": "^15.5.0",
+    "klona": "^2.0.4",
     "next": "10.0.6",
     "next-auth": "^3.4.1",
     "nexus": "^1.0.0",
@@ -24,12 +26,15 @@
     "passport": "^0.4.1",
     "passport-local": "^1.0.0",
     "pg": "^8.5.1",
+    "postcss": "^8.2.6",
     "react": "17.0.1",
     "react-dom": "17.0.1",
     "reflect-metadata": "^0.1.13",
+    "tailwindcss": "^2.0.3",
     "ts-node": "^9.1.1",
     "type-graphql": "^1.1.1",
-    "typeorm": "^0.2.31"
+    "typeorm": "^0.2.31",
+    "urql": "^2.0.1"
   },
   "devDependencies": {
     "@types/node": "^14.14.25",
