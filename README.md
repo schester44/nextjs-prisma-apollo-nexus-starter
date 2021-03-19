@@ -1,3 +1,5 @@
-WIP
+# Testing
 
-Inspired by https://bedrock.mxstbr.com/
+## Emails
+
+http://ethereal.email/

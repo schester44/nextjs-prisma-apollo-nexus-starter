@@ -1,0 +1,12 @@
+overwrite: true
+schema: "http://localhost:3000/api/graphql" # GraphQL endpoint
+documents: "src/client/**/*.graphql.ts" # parse graphql operations in matching files
+generates:
+  src/client/graphql/types.generated.tsx:
+    config:
+      withHooks: true
+      withComponent: false
+    plugins:
+      - "typescript"
+      - "typescript-operations"
+      - "typescript-urql"
