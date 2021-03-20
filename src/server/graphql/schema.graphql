@@ -3,7 +3,9 @@
 
 
 type Mutation {
-  createProject(projectName: String!): Project
+  createProject(name: String!): Project
+  deleteProject(id: String!): Boolean
+  updateProject(id: String!, name: String!): Project
 }
 
 enum PaidPlan {
@@ -31,6 +33,7 @@ input ProjectUsersWhereUniqueInput {
 
 type Query {
   currentUser: User
+  project(id: String!): Project
   projects: [Project]
   user(id: String): User
 }

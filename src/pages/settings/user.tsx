@@ -9,7 +9,33 @@ const User = () => {
 
   return (
     <Layout>
-      <h1>This is the user settings page.</h1>
+      <div>
+        <div className="border-b py-3 mb-3">
+          <h1 className="text-3xl font-medium">Profile</h1>
+        </div>
+
+        <div>
+          <div>Email {data.currentUser.email}</div>
+          <div>Name {data.currentUser.name}</div>
+        </div>
+      </div>
+
+      <div>
+        <div className="border-b py-3">
+          <h3 className="text-xl font-medium">Projects</h3>
+          <p className="text-sm text-gray-700">The list of projects to which you are a member.</p>
+        </div>
+
+        <div>
+          {data.currentUser.projects.map(({ project }) => {
+            return (
+              <div key={project.id} className="p-2">
+                {project.name} - {project.id}
+              </div>
+            );
+          })}
+        </div>
+      </div>
     </Layout>
   );
 };

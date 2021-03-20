@@ -64,6 +64,8 @@ export type NexusGenAllTypes = NexusGenRootTypes & NexusGenScalars & NexusGenEnu
 export interface NexusGenFieldTypes {
   Mutation: { // field return type
     createProject: NexusGenRootTypes['Project'] | null; // Project
+    deleteProject: boolean | null; // Boolean
+    updateProject: NexusGenRootTypes['Project'] | null; // Project
   }
   Project: { // field return type
     id: string; // String!
@@ -75,6 +77,7 @@ export interface NexusGenFieldTypes {
   }
   Query: { // field return type
     currentUser: NexusGenRootTypes['User'] | null; // User
+    project: NexusGenRootTypes['Project'] | null; // Project
     projects: Array<NexusGenRootTypes['Project'] | null> | null; // [Project]
     user: NexusGenRootTypes['User'] | null; // User
   }
@@ -89,6 +92,8 @@ export interface NexusGenFieldTypes {
 export interface NexusGenFieldTypeNames {
   Mutation: { // field return type name
     createProject: 'Project'
+    deleteProject: 'Boolean'
+    updateProject: 'Project'
   }
   Project: { // field return type name
     id: 'String'
@@ -100,6 +105,7 @@ export interface NexusGenFieldTypeNames {
   }
   Query: { // field return type name
     currentUser: 'User'
+    project: 'Project'
     projects: 'Project'
     user: 'User'
   }
@@ -114,10 +120,20 @@ export interface NexusGenFieldTypeNames {
 export interface NexusGenArgTypes {
   Mutation: {
     createProject: { // args
-      projectName: string; // String!
+      name: string; // String!
+    }
+    deleteProject: { // args
+      id: string; // String!
+    }
+    updateProject: { // args
+      id: string; // String!
+      name: string; // String!
     }
   }
   Query: {
+    project: { // args
+      id: string; // String!
+    }
     user: { // args
       id?: string | null; // String
     }

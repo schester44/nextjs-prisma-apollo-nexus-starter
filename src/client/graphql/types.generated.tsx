@@ -19,6 +19,7 @@ export type Query = {
   currentUser?: Maybe<User>;
   user?: Maybe<User>;
   projects?: Maybe<Array<Maybe<Project>>>;
+  project?: Maybe<Project>;
 };
 
 
@@ -26,14 +27,32 @@ export type QueryUserArgs = {
   id?: Maybe<Scalars['String']>;
 };
 
+
+export type QueryProjectArgs = {
+  id: Scalars['String'];
+};
+
 export type Mutation = {
   __typename?: 'Mutation';
   createProject?: Maybe<Project>;
+  updateProject?: Maybe<Project>;
+  deleteProject?: Maybe<Scalars['Boolean']>;
 };
 
 
 export type MutationCreateProjectArgs = {
-  projectName: Scalars['String'];
+  name: Scalars['String'];
+};
+
+
+export type MutationUpdateProjectArgs = {
+  id: Scalars['String'];
+  name: Scalars['String'];
+};
+
+
+export type MutationDeleteProjectArgs = {
+  id: Scalars['String'];
 };
 
 export type ProjectUsers = {
@@ -77,6 +96,56 @@ export type ProjectUsersProjectIdUserIdCompoundUniqueInput = {
   userId: Scalars['Int'];
 };
 
+export type CreateProjectMutationVariables = Exact<{
+  name: Scalars['String'];
+}>;
+
+
+export type CreateProjectMutation = (
+  { __typename?: 'Mutation' }
+  & { createProject?: Maybe<(
+    { __typename?: 'Project' }
+    & Pick<Project, 'id' | 'name'>
+  )> }
+);
+
+export type UpdateProjectMutationVariables = Exact<{
+  id: Scalars['String'];
+  name: Scalars['String'];
+}>;
+
+
+export type UpdateProjectMutation = (
+  { __typename?: 'Mutation' }
+  & { updateProject?: Maybe<(
+    { __typename?: 'Project' }
+    & Pick<Project, 'id' | 'name'>
+  )> }
+);
+
+export type DeleteProjectMutationVariables = Exact<{
+  id: Scalars['String'];
+}>;
+
+
+export type DeleteProjectMutation = (
+  { __typename?: 'Mutation' }
+  & Pick<Mutation, 'deleteProject'>
+);
+
+export type GetProjectQueryQueryVariables = Exact<{
+  id: Scalars['String'];
+}>;
+
+
+export type GetProjectQueryQuery = (
+  { __typename?: 'Query' }
+  & { project?: Maybe<(
+    { __typename?: 'Project' }
+    & Pick<Project, 'id' | 'name'>
+  )> }
+);
+
 export type UserProjectsQueryQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -107,6 +176,51 @@ export type GetCurrentUserQuery = (
 );
 
 
+export const CreateProjectDocument = gql`
+    mutation createProject($name: String!) {
+  createProject(name: $name) {
+    id
+    name
+  }
+}
+    `;
+
+export function useCreateProjectMutation() {
+  return Urql.useMutation<CreateProjectMutation, CreateProjectMutationVariables>(CreateProjectDocument);
+};
+export const UpdateProjectDocument = gql`
+    mutation updateProject($id: String!, $name: String!) {
+  updateProject(id: $id, name: $name) {
+    id
+    name
+  }
+}
+    `;
+
+export function useUpdateProjectMutation() {
+  return Urql.useMutation<UpdateProjectMutation, UpdateProjectMutationVariables>(UpdateProjectDocument);
+};
+export const DeleteProjectDocument = gql`
+    mutation deleteProject($id: String!) {
+  deleteProject(id: $id)
+}
+    `;
+
+export function useDeleteProjectMutation() {
+  return Urql.useMutation<DeleteProjectMutation, DeleteProjectMutationVariables>(DeleteProjectDocument);
+};
+export const GetProjectQueryDocument = gql`
+    query getProjectQuery($id: String!) {
+  project(id: $id) {
+    id
+    name
+  }
+}
+    `;
+
+export function useGetProjectQueryQuery(options: Omit<Urql.UseQueryArgs<GetProjectQueryQueryVariables>, 'query'> = {}) {
+  return Urql.useQuery<GetProjectQueryQuery>({ query: GetProjectQueryDocument, ...options });
+};
 export const UserProjectsQueryDocument = gql`
     query userProjectsQuery {
   projects {

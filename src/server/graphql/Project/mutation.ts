@@ -1,31 +1,61 @@
+import { UserInputError } from "apollo-server-micro";
 import { mutationField, nonNull, stringArg } from "nexus";
 import { Context } from "src/server/graphql/context";
 
 export const createProject = mutationField("createProject", {
   type: "Project",
   args: {
-    projectName: nonNull(stringArg()),
+    name: nonNull(stringArg()),
   },
-  async resolve(root, { projectName }, ctx: Context) {
+  async resolve(root, { name }, ctx: Context) {
     const project = await ctx.prisma.project.create({
       data: {
-        // TODO: Fixme
-        //@ts-ignore
-        name: projectName,
+        name,
       },
     });
 
     await ctx.prisma.projectUsers.create({
       data: {
-        userId: 2,
-        // TODO: Fixme
-        // userId: ctx.user.id,
+        userId: ctx.user?.id,
         projectId: project.id,
       },
     });
 
-    console.log({ project });
-
     return project;
+  },
+});
+
+export const updateProject = mutationField("updateProject", {
+  type: "Project",
+  args: {
+    id: nonNull(stringArg()),
+    name: nonNull(stringArg()),
+  },
+  async resolve(root, { id, name }, ctx: Context) {
+    const project = await ctx.prisma.project.findFirst({ where: { id } });
+
+    if (!project) {
+      throw new UserInputError("Whoops!");
+    }
+
+    await ctx.prisma.project.update({ where: { id }, data: { name } });
+
+    return ctx.prisma.project.findFirst({ where: { id } });
+  },
+});
+
+export const deleteProject = mutationField("deleteProject", {
+  type: "Boolean",
+  args: {
+    id: nonNull(stringArg()),
+  },
+  async resolve(root, { id }, ctx: Context) {
+    const project = await ctx.prisma.project.findFirst({ where: { id } });
+
+    if (!project) {
+      throw new UserInputError("Whoops!");
+    }
+
+    return ctx.prisma.project.delete({ where: { id } });
   },
 });

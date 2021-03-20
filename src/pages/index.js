@@ -34,7 +34,7 @@ function Home() {
                 <a className="mr-3 text-gray-600 hover:text-gray-700">Sign In</a>
               </Link>
             ) : (
-              <Link href="/dashboard">
+              <Link href="/app">
                 <button className="bg-gray-400 rounded px-2 py-1 text-sm cursor hover:bg-gray-600">
                   Dashboard
                 </button>
