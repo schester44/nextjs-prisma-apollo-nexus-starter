@@ -6,9 +6,9 @@ import { Project, ProjectUsers, useGetCurrentUserQuery } from "@client/graphql/t
 import ActionBar from "../ActionBar";
 import { ModalProvider } from "react-modal-hook";
 
-type LayoutProps = { children: React.ReactNode; activeProject?: Project };
+type LayoutProps = { children: React.ReactNode };
 
-const Layout = ({ children, activeProject }: LayoutProps) => {
+const Layout = ({ children }: LayoutProps) => {
   const [session, loading] = useSession();
 
   const [{ data, fetching }] = useGetCurrentUserQuery();
@@ -25,11 +25,15 @@ const Layout = ({ children, activeProject }: LayoutProps) => {
 
   if (!session || !data?.currentUser?.projects) return null;
 
+  const activeProject = data.currentUser.projects.find(
+    ({ project }) => project.id === session.currentProject
+  );
+
   return (
     <ModalProvider>
       <div className="w-full h-full flex">
         <SideNav
-          activeProject={activeProject}
+          activeProject={activeProject?.project}
           projects={data.currentUser.projects as ProjectUsers[]}
         />
         <div className="flex-1">

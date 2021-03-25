@@ -1,9 +1,14 @@
 import React from "react";
-import Link from "next/link";
-import { Project, ProjectUsers } from "@client/graphql/types.generated";
+import {
+  Project,
+  ProjectUsers,
+  useChangeSessionProjectMutation,
+} from "@client/graphql/types.generated";
 
 import { AiOutlinePlusCircle } from "react-icons/ai";
 import { DropdownMenu, MenuItem, MenuDivider } from "../../Dropdown";
+import Router from "next/router";
+import FullPageLoader from "../../FullPageLoader";
 
 const ProjectDropdown = ({
   projects,
@@ -14,13 +19,24 @@ const ProjectDropdown = ({
   onCreate: () => void;
   onEdit: (p: Project) => void;
 }) => {
+  const [{ fetching, data }, updateSession] = useChangeSessionProjectMutation();
+
+  function handleProjectSelection(project: Project) {
+    updateSession({ projectId: project.id }).then(({ data }) => {
+      if (data?.changeSessionProject) {
+        Router.reload();
+      }
+    });
+  }
+
   return (
     <DropdownMenu className="w-64">
+      {(fetching || data) && <FullPageLoader />}
+
       {projects.map(({ project }) => {
         return (
           <MenuItem
-            as={Link}
-            href={`/app/${project.id}`}
+            onClick={() => handleProjectSelection(project)}
             className="text-gray-700 text-lg flex items-center justify-between"
             key={project.id}
           >

@@ -2,7 +2,8 @@ import React from "react";
 import Modal from "@client/components/dashboard/Modal";
 import Button from "@client/components/dashboard/Button";
 import { useCreateProjectMutation } from "@client/graphql/types.generated";
-import { useRouter } from "next/router";
+import Router from "next/router";
+import FullPageLoader from "../FullPageLoader";
 
 type Props = {
   onClose: () => void;
@@ -11,13 +12,12 @@ type Props = {
 
 const CreateProjectModal = ({ onClose, visible = true }: Props) => {
   const [{ fetching }, createProject] = useCreateProjectMutation();
-  const router = useRouter();
   const [name, setName] = React.useState("");
 
   function handleAction() {
     createProject({ name }).then(({ data }) => {
       onClose();
-      router.push(`/app/${data?.createProject?.id}`);
+      Router.reload();
     });
   }
 

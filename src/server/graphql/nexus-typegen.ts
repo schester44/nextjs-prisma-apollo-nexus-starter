@@ -3,7 +3,7 @@
  * Do not make changes to this file directly
  */
 
-import * as Context from "./context"
+
 import { FieldAuthorizeResolver } from "nexus/dist/plugins/fieldAuthorizePlugin"
 
 
@@ -29,7 +29,7 @@ export interface NexusGenInputs {
 }
 
 export interface NexusGenEnums {
-  PaidPlan: "pro"
+  PaidPlan: "advanced" | "basic" | "pro"
 }
 
 export interface NexusGenScalars {
@@ -48,7 +48,11 @@ export interface NexusGenObjects {
   }
   ProjectUsers: {};
   Query: {};
-  User: Context.User;
+  User: { // root type
+    email?: string | null; // String
+    id: number; // Int!
+    name?: string | null; // String
+  }
 }
 
 export interface NexusGenInterfaces {
@@ -63,12 +67,16 @@ export type NexusGenAllTypes = NexusGenRootTypes & NexusGenScalars & NexusGenEnu
 
 export interface NexusGenFieldTypes {
   Mutation: { // field return type
+    changeSessionProject: boolean | null; // Boolean
+    createBillingPortalSession: string | null; // String
+    createCheckoutSession: string | null; // String
     createProject: NexusGenRootTypes['Project'] | null; // Project
     deleteProject: boolean | null; // Boolean
     updateProject: NexusGenRootTypes['Project'] | null; // Project
   }
   Project: { // field return type
     id: string; // String!
+    isPaying: boolean | null; // Boolean
     name: string; // String!
   }
   ProjectUsers: { // field return type
@@ -91,12 +99,16 @@ export interface NexusGenFieldTypes {
 
 export interface NexusGenFieldTypeNames {
   Mutation: { // field return type name
+    changeSessionProject: 'Boolean'
+    createBillingPortalSession: 'String'
+    createCheckoutSession: 'String'
     createProject: 'Project'
     deleteProject: 'Boolean'
     updateProject: 'Project'
   }
   Project: { // field return type name
     id: 'String'
+    isPaying: 'Boolean'
     name: 'String'
   }
   ProjectUsers: { // field return type name
@@ -119,6 +131,16 @@ export interface NexusGenFieldTypeNames {
 
 export interface NexusGenArgTypes {
   Mutation: {
+    changeSessionProject: { // args
+      projectId: string; // String!
+    }
+    createBillingPortalSession: { // args
+      projectId: string; // String!
+    }
+    createCheckoutSession: { // args
+      plan: string; // String!
+      projectId: string; // String!
+    }
     createProject: { // args
       name: string; // String!
     }

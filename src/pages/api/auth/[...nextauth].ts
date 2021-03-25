@@ -27,8 +27,16 @@ export default NextAuth({
 
     // FIXME:
     //@ts-ignore
-    async session(session, user: User & { id: number }) {
+    async session(session: Session & { currentProject: string }, user: User & { id: number }) {
       session.user.id = user.id;
+
+      const userSession = await prisma.session.findFirst({
+        where: {
+          accessToken: session.accessToken,
+        },
+      });
+
+      session.currentProject = userSession?.currentProject;
 
       return Promise.resolve(session);
     },

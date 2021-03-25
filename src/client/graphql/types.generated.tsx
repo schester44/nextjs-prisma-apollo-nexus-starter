@@ -34,9 +34,17 @@ export type QueryProjectArgs = {
 
 export type Mutation = {
   __typename?: 'Mutation';
+  changeSessionProject?: Maybe<Scalars['Boolean']>;
   createProject?: Maybe<Project>;
   updateProject?: Maybe<Project>;
   deleteProject?: Maybe<Scalars['Boolean']>;
+  createCheckoutSession?: Maybe<Scalars['String']>;
+  createBillingPortalSession?: Maybe<Scalars['String']>;
+};
+
+
+export type MutationChangeSessionProjectArgs = {
+  projectId: Scalars['String'];
 };
 
 
@@ -53,6 +61,17 @@ export type MutationUpdateProjectArgs = {
 
 export type MutationDeleteProjectArgs = {
   id: Scalars['String'];
+};
+
+
+export type MutationCreateCheckoutSessionArgs = {
+  projectId: Scalars['String'];
+  plan: Scalars['String'];
+};
+
+
+export type MutationCreateBillingPortalSessionArgs = {
+  projectId: Scalars['String'];
 };
 
 export type ProjectUsers = {
@@ -78,6 +97,8 @@ export type UserProjectsArgs = {
 };
 
 export enum PaidPlan {
+  Basic = 'basic',
+  Advanced = 'advanced',
   Pro = 'pro'
 }
 
@@ -85,6 +106,7 @@ export type Project = {
   __typename?: 'Project';
   id: Scalars['String'];
   name: Scalars['String'];
+  isPaying?: Maybe<Scalars['Boolean']>;
 };
 
 export type ProjectUsersWhereUniqueInput = {
@@ -95,6 +117,27 @@ export type ProjectUsersProjectIdUserIdCompoundUniqueInput = {
   projectId: Scalars['String'];
   userId: Scalars['Int'];
 };
+
+export type CreateCheckoutSessionMutationVariables = Exact<{
+  plan: Scalars['String'];
+  projectId: Scalars['String'];
+}>;
+
+
+export type CreateCheckoutSessionMutation = (
+  { __typename?: 'Mutation' }
+  & Pick<Mutation, 'createCheckoutSession'>
+);
+
+export type CreateBillingPortalSessionMutationVariables = Exact<{
+  projectId: Scalars['String'];
+}>;
+
+
+export type CreateBillingPortalSessionMutation = (
+  { __typename?: 'Mutation' }
+  & Pick<Mutation, 'createBillingPortalSession'>
+);
 
 export type CreateProjectMutationVariables = Exact<{
   name: Scalars['String'];
@@ -133,6 +176,16 @@ export type DeleteProjectMutation = (
   & Pick<Mutation, 'deleteProject'>
 );
 
+export type ChangeSessionProjectMutationVariables = Exact<{
+  projectId: Scalars['String'];
+}>;
+
+
+export type ChangeSessionProjectMutation = (
+  { __typename?: 'Mutation' }
+  & Pick<Mutation, 'changeSessionProject'>
+);
+
 export type GetProjectQueryQueryVariables = Exact<{
   id: Scalars['String'];
 }>;
@@ -142,7 +195,7 @@ export type GetProjectQueryQuery = (
   { __typename?: 'Query' }
   & { project?: Maybe<(
     { __typename?: 'Project' }
-    & Pick<Project, 'id' | 'name'>
+    & Pick<Project, 'id' | 'name' | 'isPaying'>
   )> }
 );
 
@@ -176,6 +229,24 @@ export type GetCurrentUserQuery = (
 );
 
 
+export const CreateCheckoutSessionDocument = gql`
+    mutation createCheckoutSession($plan: String!, $projectId: String!) {
+  createCheckoutSession(plan: $plan, projectId: $projectId)
+}
+    `;
+
+export function useCreateCheckoutSessionMutation() {
+  return Urql.useMutation<CreateCheckoutSessionMutation, CreateCheckoutSessionMutationVariables>(CreateCheckoutSessionDocument);
+};
+export const CreateBillingPortalSessionDocument = gql`
+    mutation createBillingPortalSession($projectId: String!) {
+  createBillingPortalSession(projectId: $projectId)
+}
+    `;
+
+export function useCreateBillingPortalSessionMutation() {
+  return Urql.useMutation<CreateBillingPortalSessionMutation, CreateBillingPortalSessionMutationVariables>(CreateBillingPortalSessionDocument);
+};
 export const CreateProjectDocument = gql`
     mutation createProject($name: String!) {
   createProject(name: $name) {
@@ -209,11 +280,21 @@ export const DeleteProjectDocument = gql`
 export function useDeleteProjectMutation() {
   return Urql.useMutation<DeleteProjectMutation, DeleteProjectMutationVariables>(DeleteProjectDocument);
 };
+export const ChangeSessionProjectDocument = gql`
+    mutation changeSessionProject($projectId: String!) {
+  changeSessionProject(projectId: $projectId)
+}
+    `;
+
+export function useChangeSessionProjectMutation() {
+  return Urql.useMutation<ChangeSessionProjectMutation, ChangeSessionProjectMutationVariables>(ChangeSessionProjectDocument);
+};
 export const GetProjectQueryDocument = gql`
     query getProjectQuery($id: String!) {
   project(id: $id) {
     id
     name
+    isPaying
   }
 }
     `;

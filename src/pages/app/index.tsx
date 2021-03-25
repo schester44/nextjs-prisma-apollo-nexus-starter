@@ -1,32 +1,45 @@
-import { User } from "@client/graphql/types.generated";
-import { NextApiRequest } from "next";
-import { getSession } from "next-auth/client";
-import React from "react";
-import prisma from "src/db/prisma/client";
+import Layout from "@client/components/dashboard/Layout";
+import { Project, User } from "@client/graphql/types.generated";
+import { getSessionProject } from "src/server/session";
+import { NextPageContext } from "next";
 import { useRouter } from "next/router";
+import React from "react";
+import CreateProjectModal from "@client/components/dashboard/CreateProjectModal";
+import { getSession } from "next-auth/client";
 
-const AppIndex = ({ redirectTo }: { redirectTo: string }) => {
+const AppIndex = ({ user, project }: { user: User; project: Project | undefined }) => {
   const router = useRouter();
 
-
-  
   React.useEffect(() => {
-    router.push(redirectTo);
-  }, [redirectTo]);
+    if (!project) router.push("/app");
+  }, [project]);
 
-  return null;
+  if (!project) return <CreateProjectModal onClose={console.log} />;
+
+  return (
+    <Layout activeProject={project}>
+      <h1 className="text-3xl p-4 font-semibold">Getting started with X, {user?.name}</h1>
+      <p>This is the Project Dashboard for {project?.name}.</p>
+    </Layout>
+  );
 };
 
-export async function getServerSideProps({ req }: { req: NextApiRequest }) {
+export async function getServerSideProps({ req, res }: NextPageContext) {
   const session = await getSession({ req });
-  const user = session?.user as User | undefined;
 
-  const project = await prisma.projectUsers.findFirst({ where: { userId: user?.id } });
+  if (!session) {
+    res.writeHead(302, { Location: "/" });
+    res.end();
+    return {};
+  }
+
+  const userProject = await getSessionProject(req);
 
   return {
     props: {
-      redirectTo: project ? `/app/${project.projectId}` : "/api/auth/login",
-    }, // will be passed to the page component as props
+      user: session?.user || null,
+      project: userProject?.project || null,
+    },
   };
 }
 

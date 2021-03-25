@@ -27,21 +27,24 @@ model ProjectUsers {
 }
 
 model Project {
-  id    String         @id @default(uuid())
-  name  String
-  users ProjectUsers[]
+  id                String         @id @default(uuid())
+  name              String
+  users             ProjectUsers[]
+  externalBillingId String?
+  subscription      Subscription[]
 }
 
 model Session {
-  id           Int      @id @default(autoincrement())
-  userId       Int      @map(name: "user_id")
-  expires      DateTime
-  sessionToken String   @unique @map(name: "session_token")
-  accessToken  String   @unique @map(name: "access_token")
-  createdAt    DateTime @default(now()) @map(name: "created_at")
-  updatedAt    DateTime @default(now()) @map(name: "updated_at")
+  id             Int      @id @default(autoincrement())
+  userId         Int      @map(name: "user_id")
+  expires        DateTime
+  sessionToken   String   @unique @map(name: "session_token")
+  accessToken    String   @unique @map(name: "access_token")
+  createdAt      DateTime @default(now()) @map(name: "created_at")
+  updatedAt      DateTime @default(now()) @map(name: "updated_at")
+  currentProject String?
 
-  @@map(name: "verification_requests")
+  @@map(name: "sessions")
 }
 
 model User {
@@ -65,5 +68,23 @@ model VerificationRequest {
   createdAt  DateTime @default(now()) @map(name: "created_at")
   updatedAt  DateTime @default(now()) @map(name: "updated_at")
 
-  @@map(name: "sessions")
+  @@map(name: "verification_requests")
+}
+
+model SubscriptionPlan {
+  id                String         @id @default(uuid())
+  externalProductId String
+  pricePerMonth     Int
+  subscriptions     Subscription[]
+}
+
+model Subscription {
+  id         String           @id @default(uuid())
+  project    Project          @relation(fields: [projectId], references: [id])
+  projectId  String
+  plan       SubscriptionPlan @relation(fields: [planId], references: [id])
+  planId     String
+  externalId String
+  startDate  DateTime         @default(now())
+  endDate    DateTime         @default(now())
 }

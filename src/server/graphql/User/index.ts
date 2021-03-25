@@ -1,4 +1,5 @@
 export * from "./query";
+export * from "./mutation";
 
 import { objectType } from "@nexus/schema";
 

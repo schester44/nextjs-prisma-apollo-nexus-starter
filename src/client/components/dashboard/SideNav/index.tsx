@@ -1,6 +1,6 @@
 import { Project, ProjectUsers } from "@client/graphql/types.generated";
 import React from "react";
-import { BiHomeSmile } from "react-icons/bi";
+import { BiCog, BiHomeSmile } from "react-icons/bi";
 import { Dropdown } from "../Dropdown";
 import { AiOutlineShop } from "react-icons/ai";
 import { FiChevronDown } from "react-icons/fi";
@@ -9,7 +9,6 @@ import ProjectDropdown from "./ProjectDropdown";
 import EditProjectModal from "../EditProjectModal";
 import CreateProjectModal from "../CreateProjectModal";
 import useModalWithData from "@client/hooks/useModalWithData";
-import { useRouter } from "next/router";
 
 type SideNavProps = {
   projects: ProjectUsers[];
@@ -17,8 +16,6 @@ type SideNavProps = {
 };
 
 const SideNav = ({ projects, activeProject }: SideNavProps) => {
-  const router = useRouter()
-
   const [showEditModal, hideEditModal] = useModalWithData<Project>((project) => () =>
     project ? <EditProjectModal onClose={hideEditModal} project={project} /> : null
   );
@@ -26,6 +23,8 @@ const SideNav = ({ projects, activeProject }: SideNavProps) => {
   const [showCreateModal, hideCreateModal] = useModalWithData<Project>((project) => () =>
     project ? <CreateProjectModal onClose={hideCreateModal} project={project} /> : null
   );
+
+  if (!activeProject) return null;
 
   return (
     <div className="bg-gray-100 border-r h-full w-1/5 px-6 py-3">
@@ -50,6 +49,8 @@ const SideNav = ({ projects, activeProject }: SideNavProps) => {
 
       <div className="mt-8">
         <NavMenuItem label="Home" href="/app" icon={<BiHomeSmile className="text-lg" />} />
+
+        <NavMenuItem label="Settings" href="/app/settings" icon={<BiCog className="text-lg" />} />
       </div>
     </div>
   );

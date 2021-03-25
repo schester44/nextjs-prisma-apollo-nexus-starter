@@ -4,6 +4,7 @@ import { nexusPrisma } from "nexus-plugin-prisma";
 
 import * as User from "./User";
 import * as Project from "./Project";
+import * as Billing from "./Billing";
 
 const Mutation = mutationType({
   definition(t) {},
@@ -13,7 +14,7 @@ const Query = queryType({
   definition(t) {},
 });
 
-const resolvers = { Query, Mutation, ...User, ...Project };
+const resolvers = { Query, Mutation, ...User, ...Project, ...Billing };
 
 const outputPath = path.join(process.cwd(), "src", "server", "graphql");
 

@@ -1,4 +1,4 @@
-import { UserInputError } from "apollo-server-micro";
+import { AuthenticationError, UserInputError } from "apollo-server-micro";
 import { mutationField, nonNull, stringArg } from "nexus";
 import { Context } from "src/server/graphql/context";
 
@@ -8,6 +8,8 @@ export const createProject = mutationField("createProject", {
     name: nonNull(stringArg()),
   },
   async resolve(root, { name }, ctx: Context) {
+    if (!ctx.user) throw new AuthenticationError("Not authenticated");
+
     const project = await ctx.prisma.project.create({
       data: {
         name,
@@ -20,6 +22,17 @@ export const createProject = mutationField("createProject", {
         projectId: project.id,
       },
     });
+
+    if (ctx.session) {
+      await ctx.prisma.session.update({
+        where: {
+          accessToken: ctx.session.accessToken,
+        },
+        data: {
+          currentProject: project.id,
+        },
+      });
+    }
 
     return project;
   },

@@ -2,7 +2,8 @@
   "compilerOptions": {
     "paths": {
       "@client/*": ["src/client/*"],
-      "@/components/*": ["client/components/*"]
+      "@server/*": ["src/server/*"],
+      "@db/*": ["src/db/*"]
     },
     "baseUrl": ".",
     "emitDecoratorMetadata": true,

@@ -3,17 +3,23 @@
 
 
 type Mutation {
+  changeSessionProject(projectId: String!): Boolean
+  createBillingPortalSession(projectId: String!): String
+  createCheckoutSession(plan: String!, projectId: String!): String
   createProject(name: String!): Project
   deleteProject(id: String!): Boolean
   updateProject(id: String!, name: String!): Project
 }
 
 enum PaidPlan {
+  advanced
+  basic
   pro
 }
 
 type Project {
   id: String!
+  isPaying: Boolean
   name: String!
 }
 

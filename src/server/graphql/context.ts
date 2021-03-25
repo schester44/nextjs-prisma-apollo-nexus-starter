@@ -1,16 +1,13 @@
 import { getSession } from "next-auth/client";
 import prisma from "src/db/prisma/client";
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient, User } from "@prisma/client";
 import { NextApiRequest } from "next";
-
-type User = {
-  id: number;
-  username: string;
-};
+import { Session } from "next-auth";
 
 export interface Context {
-  user?: User;
+  user?: Pick<User, "id" | "email" | "name">;
   prisma: PrismaClient;
+  session: Session | null;
 }
 
 export async function createContext({ req }: { req: NextApiRequest }): Promise<Context> {
@@ -18,5 +15,5 @@ export async function createContext({ req }: { req: NextApiRequest }): Promise<C
   const session = await getSession({ req });
   const user = session?.user as User | undefined;
 
-  return { prisma, user };
+  return { prisma, user, session };
 }
