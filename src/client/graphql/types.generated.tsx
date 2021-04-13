@@ -12,24 +12,19 @@ export type Scalars = {
   Boolean: boolean;
   Int: number;
   Float: number;
+  DateTime: any;
 };
 
 export type Query = {
   __typename?: 'Query';
   currentUser?: Maybe<User>;
-  user?: Maybe<User>;
   projects?: Maybe<Array<Maybe<Project>>>;
   project?: Maybe<Project>;
 };
 
 
-export type QueryUserArgs = {
-  id?: Maybe<Scalars['String']>;
-};
-
-
 export type QueryProjectArgs = {
-  id: Scalars['String'];
+  id?: Maybe<Scalars['String']>;
 };
 
 export type Mutation = {
@@ -38,6 +33,7 @@ export type Mutation = {
   createProject?: Maybe<Project>;
   updateProject?: Maybe<Project>;
   deleteProject?: Maybe<Scalars['Boolean']>;
+  changeSubscriptionPlan?: Maybe<Scalars['Boolean']>;
   createCheckoutSession?: Maybe<Scalars['String']>;
   createBillingPortalSession?: Maybe<Scalars['String']>;
 };
@@ -61,6 +57,12 @@ export type MutationUpdateProjectArgs = {
 
 export type MutationDeleteProjectArgs = {
   id: Scalars['String'];
+};
+
+
+export type MutationChangeSubscriptionPlanArgs = {
+  projectId: Scalars['String'];
+  plan: Scalars['String'];
 };
 
 
@@ -102,15 +104,46 @@ export enum PaidPlan {
   Pro = 'pro'
 }
 
+export type Subscription = {
+  __typename?: 'Subscription';
+  id: Scalars['String'];
+  endDate: Scalars['DateTime'];
+  externalProductId: Scalars['String'];
+  planLevel?: Maybe<PaidPlan>;
+};
+
 export type Project = {
   __typename?: 'Project';
   id: Scalars['String'];
   name: Scalars['String'];
+  users: Array<ProjectUsers>;
+  subscriptions: Array<Subscription>;
   isPaying?: Maybe<Scalars['Boolean']>;
+};
+
+
+export type ProjectUsersArgs = {
+  first?: Maybe<Scalars['Int']>;
+  last?: Maybe<Scalars['Int']>;
+  before?: Maybe<ProjectUsersWhereUniqueInput>;
+  after?: Maybe<ProjectUsersWhereUniqueInput>;
+};
+
+
+export type ProjectSubscriptionsArgs = {
+  first?: Maybe<Scalars['Int']>;
+  last?: Maybe<Scalars['Int']>;
+  before?: Maybe<SubscriptionWhereUniqueInput>;
+  after?: Maybe<SubscriptionWhereUniqueInput>;
 };
 
 export type ProjectUsersWhereUniqueInput = {
   projectId_userId?: Maybe<ProjectUsersProjectIdUserIdCompoundUniqueInput>;
+};
+
+
+export type SubscriptionWhereUniqueInput = {
+  id?: Maybe<Scalars['String']>;
 };
 
 export type ProjectUsersProjectIdUserIdCompoundUniqueInput = {
@@ -137,6 +170,17 @@ export type CreateBillingPortalSessionMutationVariables = Exact<{
 export type CreateBillingPortalSessionMutation = (
   { __typename?: 'Mutation' }
   & Pick<Mutation, 'createBillingPortalSession'>
+);
+
+export type ChangeSubscriptionPlanMutationVariables = Exact<{
+  projectId: Scalars['String'];
+  plan: Scalars['String'];
+}>;
+
+
+export type ChangeSubscriptionPlanMutation = (
+  { __typename?: 'Mutation' }
+  & Pick<Mutation, 'changeSubscriptionPlan'>
 );
 
 export type CreateProjectMutationVariables = Exact<{
@@ -196,6 +240,10 @@ export type GetProjectQueryQuery = (
   & { project?: Maybe<(
     { __typename?: 'Project' }
     & Pick<Project, 'id' | 'name' | 'isPaying'>
+    & { subscriptions: Array<(
+      { __typename?: 'Subscription' }
+      & Pick<Subscription, 'externalProductId' | 'planLevel' | 'endDate'>
+    )> }
   )> }
 );
 
@@ -247,6 +295,15 @@ export const CreateBillingPortalSessionDocument = gql`
 export function useCreateBillingPortalSessionMutation() {
   return Urql.useMutation<CreateBillingPortalSessionMutation, CreateBillingPortalSessionMutationVariables>(CreateBillingPortalSessionDocument);
 };
+export const ChangeSubscriptionPlanDocument = gql`
+    mutation changeSubscriptionPlan($projectId: String!, $plan: String!) {
+  changeSubscriptionPlan(projectId: $projectId, plan: $plan)
+}
+    `;
+
+export function useChangeSubscriptionPlanMutation() {
+  return Urql.useMutation<ChangeSubscriptionPlanMutation, ChangeSubscriptionPlanMutationVariables>(ChangeSubscriptionPlanDocument);
+};
 export const CreateProjectDocument = gql`
     mutation createProject($name: String!) {
   createProject(name: $name) {
@@ -295,6 +352,11 @@ export const GetProjectQueryDocument = gql`
     id
     name
     isPaying
+    subscriptions {
+      externalProductId
+      planLevel
+      endDate
+    }
   }
 }
     `;

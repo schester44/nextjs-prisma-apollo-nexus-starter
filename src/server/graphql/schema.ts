@@ -14,6 +14,7 @@ const Query = queryType({
   definition(t) {},
 });
 
+// FIXME: This feels wrong
 const resolvers = { Query, Mutation, ...User, ...Project, ...Billing };
 
 const outputPath = path.join(process.cwd(), "src", "server", "graphql");

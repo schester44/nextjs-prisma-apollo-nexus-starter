@@ -26,6 +26,9 @@ export interface NexusGenInputs {
   ProjectUsersWhereUniqueInput: { // input type
     projectId_userId?: NexusGenInputs['ProjectUsersProjectIdUserIdCompoundUniqueInput'] | null; // ProjectUsersProjectIdUserIdCompoundUniqueInput
   }
+  SubscriptionWhereUniqueInput: { // input type
+    id?: string | null; // String
+  }
 }
 
 export interface NexusGenEnums {
@@ -38,6 +41,7 @@ export interface NexusGenScalars {
   Float: number
   Boolean: boolean
   ID: string
+  DateTime: any
 }
 
 export interface NexusGenObjects {
@@ -48,6 +52,11 @@ export interface NexusGenObjects {
   }
   ProjectUsers: {};
   Query: {};
+  Subscription: { // root type
+    endDate: NexusGenScalars['DateTime']; // DateTime!
+    externalProductId: string; // String!
+    id: string; // String!
+  }
   User: { // root type
     email?: string | null; // String
     id: number; // Int!
@@ -68,6 +77,7 @@ export type NexusGenAllTypes = NexusGenRootTypes & NexusGenScalars & NexusGenEnu
 export interface NexusGenFieldTypes {
   Mutation: { // field return type
     changeSessionProject: boolean | null; // Boolean
+    changeSubscriptionPlan: boolean | null; // Boolean
     createBillingPortalSession: string | null; // String
     createCheckoutSession: string | null; // String
     createProject: NexusGenRootTypes['Project'] | null; // Project
@@ -78,6 +88,8 @@ export interface NexusGenFieldTypes {
     id: string; // String!
     isPaying: boolean | null; // Boolean
     name: string; // String!
+    subscriptions: NexusGenRootTypes['Subscription'][]; // [Subscription!]!
+    users: NexusGenRootTypes['ProjectUsers'][]; // [ProjectUsers!]!
   }
   ProjectUsers: { // field return type
     project: NexusGenRootTypes['Project']; // Project!
@@ -87,7 +99,12 @@ export interface NexusGenFieldTypes {
     currentUser: NexusGenRootTypes['User'] | null; // User
     project: NexusGenRootTypes['Project'] | null; // Project
     projects: Array<NexusGenRootTypes['Project'] | null> | null; // [Project]
-    user: NexusGenRootTypes['User'] | null; // User
+  }
+  Subscription: { // field return type
+    endDate: NexusGenScalars['DateTime']; // DateTime!
+    externalProductId: string; // String!
+    id: string; // String!
+    planLevel: NexusGenEnums['PaidPlan'] | null; // PaidPlan
   }
   User: { // field return type
     email: string | null; // String
@@ -100,6 +117,7 @@ export interface NexusGenFieldTypes {
 export interface NexusGenFieldTypeNames {
   Mutation: { // field return type name
     changeSessionProject: 'Boolean'
+    changeSubscriptionPlan: 'Boolean'
     createBillingPortalSession: 'String'
     createCheckoutSession: 'String'
     createProject: 'Project'
@@ -110,6 +128,8 @@ export interface NexusGenFieldTypeNames {
     id: 'String'
     isPaying: 'Boolean'
     name: 'String'
+    subscriptions: 'Subscription'
+    users: 'ProjectUsers'
   }
   ProjectUsers: { // field return type name
     project: 'Project'
@@ -119,7 +139,12 @@ export interface NexusGenFieldTypeNames {
     currentUser: 'User'
     project: 'Project'
     projects: 'Project'
-    user: 'User'
+  }
+  Subscription: { // field return type name
+    endDate: 'DateTime'
+    externalProductId: 'String'
+    id: 'String'
+    planLevel: 'PaidPlan'
   }
   User: { // field return type name
     email: 'String'
@@ -132,6 +157,10 @@ export interface NexusGenFieldTypeNames {
 export interface NexusGenArgTypes {
   Mutation: {
     changeSessionProject: { // args
+      projectId: string; // String!
+    }
+    changeSubscriptionPlan: { // args
+      plan: string; // String!
       projectId: string; // String!
     }
     createBillingPortalSession: { // args
@@ -152,11 +181,22 @@ export interface NexusGenArgTypes {
       name: string; // String!
     }
   }
+  Project: {
+    subscriptions: { // args
+      after?: NexusGenInputs['SubscriptionWhereUniqueInput'] | null; // SubscriptionWhereUniqueInput
+      before?: NexusGenInputs['SubscriptionWhereUniqueInput'] | null; // SubscriptionWhereUniqueInput
+      first?: number | null; // Int
+      last?: number | null; // Int
+    }
+    users: { // args
+      after?: NexusGenInputs['ProjectUsersWhereUniqueInput'] | null; // ProjectUsersWhereUniqueInput
+      before?: NexusGenInputs['ProjectUsersWhereUniqueInput'] | null; // ProjectUsersWhereUniqueInput
+      first?: number | null; // Int
+      last?: number | null; // Int
+    }
+  }
   Query: {
     project: { // args
-      id: string; // String!
-    }
-    user: { // args
       id?: string | null; // String
     }
   }

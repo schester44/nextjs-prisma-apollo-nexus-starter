@@ -2,8 +2,11 @@
 ### Do not make changes to this file directly
 
 
+scalar DateTime
+
 type Mutation {
   changeSessionProject(projectId: String!): Boolean
+  changeSubscriptionPlan(plan: String!, projectId: String!): Boolean
   createBillingPortalSession(projectId: String!): String
   createCheckoutSession(plan: String!, projectId: String!): String
   createProject(name: String!): Project
@@ -21,6 +24,8 @@ type Project {
   id: String!
   isPaying: Boolean
   name: String!
+  subscriptions(after: SubscriptionWhereUniqueInput, before: SubscriptionWhereUniqueInput, first: Int, last: Int): [Subscription!]!
+  users(after: ProjectUsersWhereUniqueInput, before: ProjectUsersWhereUniqueInput, first: Int, last: Int): [ProjectUsers!]!
 }
 
 type ProjectUsers {
@@ -39,9 +44,19 @@ input ProjectUsersWhereUniqueInput {
 
 type Query {
   currentUser: User
-  project(id: String!): Project
+  project(id: String): Project
   projects: [Project]
-  user(id: String): User
+}
+
+type Subscription {
+  endDate: DateTime!
+  externalProductId: String!
+  id: String!
+  planLevel: PaidPlan
+}
+
+input SubscriptionWhereUniqueInput {
+  id: String
 }
 
 type User {

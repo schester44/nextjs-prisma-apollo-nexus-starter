@@ -1,17 +1,23 @@
 import { extendType } from "@nexus/schema";
-import { nonNull, stringArg } from "nexus";
-import { Context } from "src/server/graphql/context";
+import { AuthenticationError, UserInputError } from "apollo-server-errors";
+import { stringArg } from "nexus";
+import { AuthenticatedUserContext, Context } from "src/server/graphql/context";
+import { isAuthenticated } from "../auth";
+import { logger } from "src/server/logging";
 
 export const projects = extendType({
   type: "Query",
   definition(t) {
     t.list.field("projects", {
       type: "Project",
-      async resolve(parent, args, ctx: Context) {
-        // TODO: Only return a users projects
-        const projects = await ctx.prisma.project.findMany({});
+      authorize: isAuthenticated,
+      async resolve(parent, args, ctx: AuthenticatedUserContext) {
+        const projects = await ctx.prisma.projectUsers.findMany({
+          where: { userId: ctx.user.id },
+          include: { project: true },
+        });
 
-        return projects;
+        return projects.map(({ project }) => project);
       },
     });
   },
@@ -23,12 +29,14 @@ export const project = extendType({
     t.field("project", {
       type: "Project",
       args: {
-        id: nonNull(stringArg()),
+        //FIXME:
+        id: stringArg(),
       },
-      async resolve(parent, { id }, ctx: Context) {
+      authorize: isAuthenticated,
+      async resolve(parent, { id }, ctx: AuthenticatedUserContext) {
         const pu = await ctx.prisma.projectUsers.findFirst({
           where: {
-            userId: ctx.user?.id,
+            userId: ctx.user.id,
             projectId: id,
           },
           include: {
@@ -36,7 +44,13 @@ export const project = extendType({
           },
         });
 
-        return pu?.project;
+        if (!pu) {
+          logger.info(`User ${ctx.user.id} requested a project  (${id}) that does not exist.`);
+
+          throw new UserInputError("The requested project does not exit");
+        }
+
+        return pu.project;
       },
     });
   },

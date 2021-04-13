@@ -1,15 +1,16 @@
+import { logger } from "@server/logging";
 import { UserInputError } from "apollo-server-micro";
 import { mutationField, nonNull, stringArg } from "nexus";
-import { Context } from "src/server/graphql/context";
+import { AuthenticatedUserContext } from "src/server/graphql/context";
+import { isAuthenticated } from "../auth";
 
 export const changeSessionProject = mutationField("changeSessionProject", {
   type: "Boolean",
   args: {
     projectId: nonNull(stringArg()),
   },
-  async resolve(root, { projectId }, ctx: Context) {
-    if (!ctx.user || !ctx.session) return false;
-
+  authorize: isAuthenticated,
+  async resolve(root, { projectId }, ctx: AuthenticatedUserContext) {
     const project = await ctx.prisma.projectUsers.findFirst({
       where: {
         projectId,
@@ -17,7 +18,13 @@ export const changeSessionProject = mutationField("changeSessionProject", {
       },
     });
 
-    if (!project) throw new UserInputError("Invalid args");
+    if (!project) {
+      logger.info(
+        `User ${ctx.user.id} tried to change their session project to one that does not exist (${projectId})`
+      );
+
+      throw new UserInputError("Project does not exist");
+    }
 
     await ctx.prisma.session.update({
       where: {

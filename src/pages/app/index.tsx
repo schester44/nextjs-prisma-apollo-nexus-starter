@@ -4,7 +4,6 @@ import { getSessionProject } from "src/server/session";
 import { NextPageContext } from "next";
 import { useRouter } from "next/router";
 import React from "react";
-import CreateProjectModal from "@client/components/dashboard/CreateProjectModal";
 import { getSession } from "next-auth/client";
 
 const AppIndex = ({ user, project }: { user: User; project: Project | undefined }) => {
@@ -14,7 +13,6 @@ const AppIndex = ({ user, project }: { user: User; project: Project | undefined 
     if (!project) router.push("/app");
   }, [project]);
 
-  if (!project) return <CreateProjectModal onClose={console.log} />;
 
   return (
     <Layout activeProject={project}>

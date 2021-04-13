@@ -11,3 +11,9 @@ export const createBillingPortalSessionMutation = gql`
     createBillingPortalSession(projectId: $projectId)
   }
 `;
+
+export const changeSubscriptionPlan = gql`
+  mutation changeSubscriptionPlan($projectId: String!, $plan: String!) {
+    changeSubscriptionPlan(projectId: $projectId, plan: $plan)
+  }
+`;

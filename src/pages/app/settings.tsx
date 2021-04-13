@@ -2,6 +2,8 @@ import Button from "@client/components/dashboard/Button";
 import Layout from "@client/components/dashboard/Layout";
 import {
   PaidPlan,
+  Subscription,
+  useChangeSubscriptionPlanMutation,
   useCreateBillingPortalSessionMutation,
   useCreateCheckoutSessionMutation,
 } from "@client/graphql/types.generated";
@@ -13,6 +15,7 @@ import { useRouter } from "next/router";
 import React from "react";
 import prisma from "src/db/prisma/client";
 import CreateProjectModal from "@client/components/dashboard/CreateProjectModal";
+import { plans } from "@server/services/stripe/plans";
 
 function BillingButton({ children, projectId }: { children: React.ReactNode; projectId: string }) {
   const [, createPortalSession] = useCreateBillingPortalSessionMutation();
@@ -32,14 +35,18 @@ function BillingButton({ children, projectId }: { children: React.ReactNode; pro
   );
 }
 
-function UpgradeButton({ children, projectId }: { children: React.ReactNode; projectId: string }) {
+function SubscribeButton({
+  children,
+  projectId,
+}: {
+  children: React.ReactNode;
+  projectId: string;
+}) {
   const [, createCheckoutSession] = useCreateCheckoutSessionMutation();
 
   function redirectToCheckout() {
     Promise.all([
-      loadStripe(
-        "pk_test_51IWaHAFekyIaHSTbkno4T5JtZWlUWEBFe8EMycXFCR0aLz1xf8r6xUMVQzPiCL3Nczuff27ZCYuEH1Cl9HqC9w9t00JcjsiI15"
-      ),
+      loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLIC as string),
       createCheckoutSession({ plan: PaidPlan.Pro, projectId }).then(
         ({ data }) => data?.createCheckoutSession
       ),
@@ -57,53 +64,96 @@ function UpgradeButton({ children, projectId }: { children: React.ReactNode; pro
   );
 }
 
-const settings = ({ isPaying, project }: { isPaying: boolean; project: Project | undefined }) => {
+const selectedClasses = "bg-green-400 border-green-400 hover:bg-green-500 hover:border-green-500";
+
+const settings = ({
+  subscription,
+  project,
+}: {
+  subscription: string | undefined;
+  project: Project | undefined;
+}) => {
   const router = useRouter();
+  const [, changeSubscription] = useChangeSubscriptionPlanMutation();
 
   React.useEffect(() => {
     if (!project) router.push("/app");
   }, [project]);
 
-  if (!project) return <CreateProjectModal onClose={console.log} />;
+  function handleSubscriptionChange(plan: string) {
+    if (!project) return false;
+
+    changeSubscription({
+      plan,
+      projectId: project?.id,
+    }).then(({ data }) => {
+      console.log(data);
+    });
+  }
+
+  if (!project) return null;
+
+  const sub: Subscription | undefined = subscription ? JSON.parse(subscription) : undefined;
+  const isActive = new Date(sub?.endDate) >= new Date();
 
   return (
     <Layout activeProject={project}>
       <h1 className="text-3xl p-4 font-semibold"> Settings page for {project.name}</h1>
 
       <div className="pt-8">
-        {!isPaying && <UpgradeButton projectId={project.id}>Upgrade</UpgradeButton>}
-        {isPaying && <BillingButton projectId={project.id}>Billing</BillingButton>}
+        {!isActive && <SubscribeButton projectId={project.id}>Upgrade</SubscribeButton>}
+        {isActive && <BillingButton projectId={project.id}>Billing</BillingButton>}
       </div>
 
       <div className="pt-8">
         <h1 className="text-3xl p-4 font-semibold">Upgrade Plan</h1>
 
-        <Button>Basic</Button>
-        <Button>Advanced</Button>
-        <Button>Pro</Button>
+        <div>
+          {Object.keys(plans).map((name) => {
+            const price = plans[name as keyof typeof plans];
+            const isSelected = sub?.externalProductId === price;
+
+            return (
+              <Button
+                key={name}
+                type={isSelected ? "primary" : "secondary"}
+                className="mx-1 capitalize"
+                onClick={() => handleSubscriptionChange(name)}
+              >
+                {name}
+              </Button>
+            );
+          })}
+        </div>
       </div>
     </Layout>
   );
 };
 
+function replacer(_: any, value: any) {
+  //@ts-ignore
+  if (typeof value === "Date") {
+    return value.toString();
+  }
+  return value;
+}
+
 export async function getServerSideProps({ req }: NextPageContext) {
   const userProject = await getSessionProject(req);
 
-  let isPaying = false;
+  let subscription;
 
   if (userProject) {
-    const subscription = await prisma.subscription.findFirst({
+    subscription = await prisma.subscription.findFirst({
       where: {
         projectId: userProject.projectId,
       },
     });
-
-    isPaying = !!subscription;
   }
 
   return {
     props: {
-      isPaying,
+      subscription: JSON.stringify(subscription, replacer),
       project: userProject?.project || null,
     },
   };

@@ -6,6 +6,11 @@ export const projectQuery = gql`
       id
       name
       isPaying
+      subscriptions {
+        externalProductId
+        planLevel
+        endDate
+      }
     }
   }
 `;

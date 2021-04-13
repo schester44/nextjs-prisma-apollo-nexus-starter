@@ -31,7 +31,7 @@ model Project {
   name              String
   users             ProjectUsers[]
   externalBillingId String?
-  subscription      Subscription[]
+  subscriptions     Subscription[]
 }
 
 model Session {
@@ -71,20 +71,12 @@ model VerificationRequest {
   @@map(name: "verification_requests")
 }
 
-model SubscriptionPlan {
-  id                String         @id @default(uuid())
-  externalProductId String
-  pricePerMonth     Int
-  subscriptions     Subscription[]
-}
-
 model Subscription {
-  id         String           @id @default(uuid())
-  project    Project          @relation(fields: [projectId], references: [id])
-  projectId  String
-  plan       SubscriptionPlan @relation(fields: [planId], references: [id])
-  planId     String
-  externalId String
-  startDate  DateTime         @default(now())
-  endDate    DateTime         @default(now())
+  id                String   @id @default(uuid())
+  project           Project  @relation(fields: [projectId], references: [id])
+  projectId         String
+  externalProductId String
+  externalId        String
+  startDate         DateTime @default(now())
+  endDate           DateTime @default(now())
 }

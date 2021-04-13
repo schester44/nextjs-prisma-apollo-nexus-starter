@@ -3,6 +3,27 @@ import Providers from "next-auth/providers";
 import Adapters from "next-auth/adapters";
 import prisma from "src/db/prisma/client";
 import { JWT } from "next-auth/jwt";
+import moniker from "moniker";
+
+async function generateProjectAndAssignToUser(user: User & { id: number }) {
+  const names = moniker.generator([moniker.adjective, moniker.noun], { glue: " " });
+
+  const project = await prisma.project.create({
+    data: {
+      name: names.choose(),
+    },
+  });
+
+  await prisma.projectUsers.create({
+    data: {
+      projectId: project.id,
+      userId: user.id,
+      role: "ADMIN",
+    },
+  });
+
+  return project;
+}
 
 const emailServerConfig = {
   host: process.env.EMAIL_SERVER_HOST || "",
@@ -37,6 +58,29 @@ export default NextAuth({
       });
 
       session.currentProject = userSession?.currentProject;
+
+      if (!session.currentProject) {
+        const projects = await prisma.projectUsers.findFirst({ where: { userId: user.id } });
+
+        if (projects) {
+          session.currentProject = projects.projectId;
+        } else {
+          const project = await generateProjectAndAssignToUser(user);
+
+          session.currentProject = project.id;
+        }
+
+        if (userSession) {
+          await  prisma.session.update({
+            data: {
+              currentProject: session.currentProject,
+            },
+            where: {
+              id: userSession.id,
+            },
+          });
+        }
+      }
 
       return Promise.resolve(session);
     },

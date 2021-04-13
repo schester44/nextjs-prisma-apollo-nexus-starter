@@ -10,6 +10,10 @@ export interface Context {
   session: Session | null;
 }
 
+export interface AuthenticatedUserContext extends Context {
+  user: Pick<User, "id" | "email" | "name">;
+}
+
 export async function createContext({ req }: { req: NextApiRequest }): Promise<Context> {
   // TODO: Implement Token Based Authentication (API Requests)
   const session = await getSession({ req });

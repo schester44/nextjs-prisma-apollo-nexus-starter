@@ -1,10 +1,86 @@
 import { mutationField, nonNull, stringArg } from "nexus";
 import { stripe, plans } from "../../services/stripe";
 
-import { Context } from "../../graphql/context";
+import { AuthenticatedUserContext, Context } from "../../graphql/context";
 import prisma from "../../../db/prisma/client";
 
 import { AuthenticationError, UserInputError } from "apollo-server-micro";
+import { isAuthenticated } from "../auth";
+import { logger } from "@server/logging";
+
+export const changeSubscriptionPlan = mutationField("changeSubscriptionPlan", {
+  type: "Boolean",
+  args: {
+    projectId: nonNull(stringArg()),
+
+    // TODO: Can we be more explicit here?
+    plan: nonNull(stringArg()),
+  },
+  authorize: isAuthenticated,
+  async resolve(root, { plan, projectId }, ctx: AuthenticatedUserContext) {
+    const pu = await prisma.projectUsers.findFirst({
+      include: { project: true },
+      where: { projectId, userId: ctx.user.id },
+    });
+
+    const project = pu?.project;
+
+    const selectedPlan = plans[plan as keyof typeof plans];
+
+    if (!selectedPlan) {
+      logger.error(
+        `${ctx.user.id} tried to change their subscription plan to a plan that does not exist (${plan}) for project ID ${projectId}.`
+      );
+
+      throw new UserInputError("Invalid  plan");
+    }
+
+    if (!project) {
+      logger.error(
+        `${ctx.user.id} tried to change their subscription plan for a project that doesn't exist (${projectId}).`
+      );
+
+      throw new UserInputError("No project found");
+    }
+
+    // Finding a subscription means that this project is already paid for and we shouldn't let them pay again.
+    const activeSubscription = await prisma.subscription.findFirst({
+      where: {
+        projectId: project.id,
+      },
+    });
+
+    if (!activeSubscription) {
+      logger.error(
+        `${ctx.user.id} tried to change their subscription plan for a project that doesn't yet have an active subscription (${projectId}).`
+      );
+
+      throw new UserInputError("Project does not have an active subscription");
+    }
+
+    const stripeSubscription = await stripe.subscriptions.retrieve(activeSubscription.externalId);
+
+    await stripe.subscriptions.update(stripeSubscription.id, {
+      cancel_at_period_end: false,
+      proration_behavior: "create_prorations",
+      items: [
+        {
+          id: stripeSubscription.items.data[0].id,
+          price: selectedPlan,
+        },
+      ],
+    });
+
+    await prisma.subscription.update({
+      data: { externalProductId: selectedPlan },
+      where: {
+        id: activeSubscription.id,
+      },
+    });
+
+    return true;
+  },
+});
 
 export const createCheckoutSession = mutationField("createCheckoutSession", {
   type: "String",
@@ -14,11 +90,8 @@ export const createCheckoutSession = mutationField("createCheckoutSession", {
     // TODO: Can we be more explicit here?
     plan: nonNull(stringArg()),
   },
-  async resolve(root, { plan, projectId }, ctx) {
-    if (!ctx.user) {
-      throw new AuthenticationError("Whoops");
-    }
-
+  authorize: isAuthenticated,
+  async resolve(root, { plan, projectId }, ctx: AuthenticatedUserContext) {
     const pu = await prisma.projectUsers.findFirst({
       include: { project: true },
       where: { projectId, userId: ctx.user.id },
@@ -26,7 +99,23 @@ export const createCheckoutSession = mutationField("createCheckoutSession", {
 
     const project = pu?.project;
 
-    if (!project) throw new UserInputError("No project found");
+    const selectedPlan = plans[plan as keyof typeof plans];
+
+    if (!selectedPlan) {
+      logger.error(
+        `${ctx.user.id} tried to create a checkout session for a plan that does not exist (${plan}) for project ID ${projectId}.`
+      );
+
+      throw new UserInputError("Invalid  plan");
+    }
+
+    if (!project) {
+      logger.error(
+        `${ctx.user.id} tried to create a checkout session for a project that doesn't exist (${projectId}).`
+      );
+
+      throw new UserInputError("No project found");
+    }
 
     let customer = project?.externalBillingId;
 
@@ -37,7 +126,13 @@ export const createCheckoutSession = mutationField("createCheckoutSession", {
       },
     });
 
-    if (activeSubscription) throw new UserInputError("Project already paid for.");
+    if (activeSubscription) {
+      logger.error(
+        `${ctx.user.id} tried to create a checkout session for a project that has already been paid for (${projectId})`
+      );
+
+      throw new UserInputError("Project already paid for.");
+    }
 
     if (!customer) {
       const { id } = await stripe.customers.create({
@@ -72,7 +167,7 @@ export const createCheckoutSession = mutationField("createCheckoutSession", {
       line_items: [
         {
           // TODO: Can we define the plans enum as an input so only a pre-defined plan name can be passed in? Let GQL handle the validation
-          price: plans[plan as keyof typeof plans] || plans.pro,
+          price: selectedPlan,
           quantity: 1,
         },
       ],
@@ -92,11 +187,8 @@ export const createBillingPortalSession = mutationField("createBillingPortalSess
   args: {
     projectId: nonNull(stringArg()),
   },
-  async resolve(root, { projectId }, ctx: Context) {
-    if (!ctx.user) {
-      throw new AuthenticationError("Whoops");
-    }
-
+  authorize: isAuthenticated,
+  async resolve(root, { projectId }, ctx: AuthenticatedUserContext) {
     const userProject = await prisma.projectUsers.findFirst({
       where: {
         userId: ctx.user.id,
@@ -108,6 +200,10 @@ export const createBillingPortalSession = mutationField("createBillingPortalSess
     });
 
     if (!userProject?.project.externalBillingId) {
+      logger.error(
+        `User ${ctx.user.id} tried to access the billing portal for a project (${projectId}) that is not paid for.`
+      );
+      
       throw new UserInputError("Non-existent project");
     }
 

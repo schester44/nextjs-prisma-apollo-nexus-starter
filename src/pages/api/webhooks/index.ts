@@ -42,23 +42,13 @@ const webhookHandler = async (req: NextApiRequest, res: NextApiResponse) => {
       case "checkout.session.completed": {
         const session = event.data.object as Stripe.Checkout.Session;
 
-        const plan = await prisma.subscriptionPlan.findFirst({
-          where: {
-            externalProductId: session.line_items?.data[0].id,
-          },
-        });
-
-        if (!plan) {
-          // FIXME: LOG AN ERROR..THIS SHOULD NEVER OCCUR
-        }
-
-        console.log("CREATE THE SUBSCRIPTION", session.subscription);
+        const lineItems = await stripe.checkout.sessions.listLineItems(session.id);
 
         await prisma.subscription.create({
           data: {
             projectId: session.client_reference_id as string,
             externalId: session.subscription as string,
-            planId: plan?.id as string,
+            externalProductId: lineItems?.data[0].price?.id as string,
             startDate: new Date(),
             // FIXME: This assumes monthly billing
             endDate: addDays(new Date(), 30),

@@ -1,19 +1,10 @@
-import { queryField, stringArg } from "@nexus/schema";
+import { queryField } from "@nexus/schema";
+import { isAuthenticated } from "../auth";
 
 export const currentUser = queryField("currentUser", {
   type: "User",
+  authorize: isAuthenticated,
   resolve(parent, args, ctx) {
-    console.log(ctx.user);
     return ctx.user;
-  },
-});
-
-export const user = queryField("user", {
-  type: "User",
-  args: {
-    id: stringArg(),
-  },
-  async resolve(parent, { id }, ctx) {
-    return ctx.prisma.user.findUnique({ where: { id } });
   },
 });
