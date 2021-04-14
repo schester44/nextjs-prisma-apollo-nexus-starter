@@ -1,0 +1,80 @@
+version: v1.0
+name: Starter App
+agent:
+  machine:
+    type: e1-standard-2
+    os_image: ubuntu1804
+blocks:
+  - name: Install
+    task:
+      jobs:
+        - name: "Yarn Install"
+          commands:
+            - checkout
+            - sem-version node 12
+            - cache restore
+            - yarn install
+            - cache store
+      env_vars:
+        - name: NODE_ENV
+          value: test
+  - name: Run Specs
+    task:
+      env_vars:
+        - name: NODE_ENV
+          value: test
+        - name: DATABASE_USER
+          value: testing
+        - name: DATABASE_PASSWORD
+          value: testing
+      prologue:
+        commands:
+          - checkout
+          - sem-version node 12
+          - cache restore
+          - yarn install
+          - sem-service start postgres 12
+          - createdb -U postgres -h 0.0.0.0 obie_test
+          - psql -U postgres -h localhost -c "CREATE USER testing WITH PASSWORD 'testing';"
+          - psql -U postgres -h localhost -c "ALTER USER testing WITH SUPERUSER;"
+          - yarn migrate:test
+      jobs:
+        - name: Run Server Tests
+          commands:
+            - yarn server:ci
+        - name: Run Client Tests
+          commands:
+            - yarn client:ci
+        - name: Run E2E Specs
+          commands:
+            - yarn cypress install
+            - yarn cypress verify
+            - mv api/.env-sample api/.env
+            - yarn start:test &
+            - yarn client:e2e
+    dependencies:
+      - Install
+  - name: Build
+    dependencies:
+      - Install
+    task:
+      jobs:
+        - name: Yarn Build
+          commands:
+            - checkout
+            - sem-version node 12
+            - cache restore
+            - yarn install
+            - yarn build
+  - name: Verify Schema
+    dependencies:
+      - Install
+    task:
+      jobs:
+        - name: Generate Types
+          commands:
+            - checkout
+            - sem-version node 12
+            - cache restore
+            - yarn install
+            - yarn generate
