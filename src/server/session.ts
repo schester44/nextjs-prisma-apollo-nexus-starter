@@ -5,12 +5,16 @@ import { IncomingMessage } from "http";
 import { Project, ProjectUsers, User } from "@prisma/client";
 import { getSession } from "next-auth/client";
 
+interface SessionWithCurrentProject extends Session {
+  currentProject?: string;
+}
+
 export const getSessionProject = async (
   req: IncomingMessage | undefined
 ): Promise<(ProjectUsers & { project: Project }) | null> => {
   if (!req) return null;
 
-  const session = await getSession({ req });
+  const session = (await getSession({ req })) as SessionWithCurrentProject | null;
   const user = session?.user as User | undefined;
 
   if (!session || !user) return null;

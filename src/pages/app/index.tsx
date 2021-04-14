@@ -13,9 +13,8 @@ const AppIndex = ({ user, project }: { user: User; project: Project | undefined 
     if (!project) router.push("/app");
   }, [project]);
 
-
   return (
-    <Layout activeProject={project}>
+    <Layout>
       <h1 className="text-3xl p-4 font-semibold">Getting started with X, {user?.name}</h1>
       <p>This is the Project Dashboard for {project?.name}.</p>
     </Layout>

@@ -18,9 +18,10 @@
     "start": "next start",
     "start:stripe": "stripe listen --forward-to localhost:3000/api/webhooks",
     "type-check": "tsc --project tsconfig.json --pretty --noEmit",
-    "watch:graphql-codegen": "graphql-codegen --watch"
+    "watch:graphql-codegen": "yarn wait-on http://localhost:3000 && graphql-codegen --watch"
   },
   "dependencies": {
+    "@headlessui/react": "^1.0.0",
     "@nexus/schema": "^0.20.1",
     "@prisma/client": "2.19.0",
     "@stripe/stripe-js": "^1.13.1",
@@ -59,7 +60,6 @@
     "pg": "^8.5.1",
     "pino": "^6.11.2",
     "postcss": "^8.2.8",
-    "rc-trigger": "^5.2.3",
     "react": "17.0.1",
     "react-dom": "17.0.1",
     "react-icons": "^4.2.0",
@@ -70,7 +70,8 @@
     "ts-node": "^9.1.1",
     "type-graphql": "^1.1.1",
     "typeorm": "^0.2.31",
-    "urql": "^2.0.1"
+    "urql": "^2.0.1",
+    "wait-on": "^5.3.0"
   },
   "devDependencies": {
     "@graphql-codegen/cli": "1.21.3",

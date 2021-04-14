@@ -1,61 +1,96 @@
-import React from "react";
-import Modal from "@client/components/dashboard/Modal";
+import React, { Fragment } from "react";
+import { Dialog, Transition } from "@headlessui/react";
 import Button from "@client/components/dashboard/Button";
 import { Project, useUpdateProjectMutation } from "@client/graphql/types.generated";
 
 type Props = {
   project: Project;
   onClose: () => void;
-  visible?: boolean;
+  open?: boolean;
 };
 
-const EditProjectModal = ({ project, onClose, visible = true }: Props) => {
+const EditProjectModal = ({ project, onClose, open = true }: Props) => {
   const [{ fetching }, updateProject] = useUpdateProjectMutation();
 
   const [name, setName] = React.useState(project.name);
 
   function handleUpdate() {
-    updateProject({ id: project.id, name }).then(onClose)
+    updateProject({ id: project.id, name }).then(onClose);
   }
 
   return (
-    <Modal width="w-full md:w-96" visible={visible} onClose={onClose}>
-      <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-        <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
-          <h3 className="text-lg leading-6 font-medium text-gray-900">Edit Project Name</h3>
-          <div className="mt-2">
-            <div className="py-4">
-              <input
-                aria-label="Project Name"
-                name="name"
-                placeholder="Project"
-                className=" appearance-none relative mt-1 rounded block w-full px-4 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:shadow-outline-blue focus:border-blue-300 focus:z-10 sm:text-sm sm:leading-5"
-                value={name}
-                onChange={({ target: { value } }) => setName(value)}
-              />
+    <Transition show={open} as={Fragment}>
+      <Dialog
+        as="div"
+        className="fixed inset-0 z-10 overflow-y-auto"
+        open={open}
+        onClose={onClose}
+        static
+      >
+        <div className="min-h-screen px-4 text-center">
+          <Transition.Child
+            as={Fragment}
+            enter="ease-out duration-300"
+            enterFrom="opacity-0"
+            enterTo="opacity-100"
+            leave="ease-in duration-200"
+            leaveFrom="opacity-100"
+            leaveTo="opacity-0"
+          >
+            <Dialog.Overlay className="fixed inset-0" />
+          </Transition.Child>
+        </div>
+
+        <Transition.Child
+          as={Fragment}
+          enter="ease-out duration-1000"
+          enterFrom="opacity-0 scale-95"
+          enterTo="opacity-100 scale-100"
+          leave="ease-in duration-200"
+          leaveFrom="opacity-100 scale-100"
+          leaveTo="opacity-0 scale-95"
+        >
+          <div className="inline-block w-full max-w-md p-6 my-8 overflow-hidden text-left align-middle transition-all transform bg-white shadow-xl rounded-2xl">
+            <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+              <Dialog.Title className="text-lg leading-6 font-medium text-gray-900">
+                Edit Project Name
+              </Dialog.Title>
+
+              <div className="mt-2">
+                <div className="py-4">
+                  <input
+                    aria-label="Project Name"
+                    name="name"
+                    placeholder="Project"
+                    className=" appearance-none relative mt-1 rounded block w-full px-4 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:shadow-outline-blue focus:border-blue-300 focus:z-10 sm:text-sm sm:leading-5"
+                    value={name}
+                    onChange={({ target: { value } }) => setName(value)}
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-gray-50 p-4 sm:px-6 sm:py-4 sm:flex-wrap sm:flex sm:items-center sm:justify-between">
+              <div className="sm:flex sm:flex-row-reverse">
+                <Button
+                  type="primary"
+                  isLoading={fetching}
+                  isDisabled={name.trim().length === 0}
+                  className="w-full mt-2 sm:ml-3 sm:mt-0 sm:w-auto mb-2 sm:mb-0"
+                  onClick={handleUpdate}
+                >
+                  Update
+                </Button>
+
+                <Button className="w-full sm:w-auto" onClick={() => onClose()}>
+                  Cancel
+                </Button>
+              </div>
             </div>
           </div>
-        </div>
-      </div>
-
-      <div className="bg-gray-50 p-4 sm:px-6 sm:py-4 sm:flex-wrap sm:flex sm:items-center sm:justify-between">
-        <div className="sm:flex sm:flex-row-reverse">
-          <Button
-            type="primary"
-            isLoading={fetching}
-            isDisabled={name.trim().length === 0}
-            className="w-full mt-2 sm:ml-3 sm:mt-0 sm:w-auto mb-2 sm:mb-0"
-            onClick={handleUpdate}
-          >
-            Update
-          </Button>
-
-          <Button className="w-full sm:w-auto" onClick={() => onClose()}>
-            Cancel
-          </Button>
-        </div>
-      </div>
-    </Modal>
+        </Transition.Child>
+      </Dialog>
+    </Transition>
   );
 };
 

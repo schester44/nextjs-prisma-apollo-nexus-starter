@@ -14,8 +14,9 @@ import { NextPageContext } from "next";
 import { useRouter } from "next/router";
 import React from "react";
 import prisma from "src/db/prisma/client";
-import CreateProjectModal from "@client/components/dashboard/CreateProjectModal";
 import { plans } from "@server/services/stripe/plans";
+import Link from "next/link";
+import SettingsNav from "@client/components/dashboard/SettingsNav";
 
 function BillingButton({ children, projectId }: { children: React.ReactNode; projectId: string }) {
   const [, createPortalSession] = useCreateBillingPortalSessionMutation();
@@ -64,8 +65,6 @@ function SubscribeButton({
   );
 }
 
-const selectedClasses = "bg-green-400 border-green-400 hover:bg-green-500 hover:border-green-500";
-
 const settings = ({
   subscription,
   project,
@@ -97,7 +96,9 @@ const settings = ({
   const isActive = new Date(sub?.endDate) >= new Date();
 
   return (
-    <Layout activeProject={project}>
+    <Layout>
+      <SettingsNav />
+
       <h1 className="text-3xl p-4 font-semibold"> Settings page for {project.name}</h1>
 
       <div className="pt-8">
