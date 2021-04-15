@@ -174,8 +174,8 @@ export const createCheckoutSession = mutationField("createCheckoutSession", {
       // {CHECKOUT_SESSION_ID} is a string literal; do not change it!
       // the actual Session ID is returned in the query parameter when your customer
       // is redirected to the success page.
-      success_url: `${process.env.NEXTAUTH_URL}/app?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${process.env.NEXTAUTH_URL}/app`,
+      success_url: `${process.env.BASE_URL}/app?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${process.env.BASE_URL}/app`,
     });
 
     return session.id;
@@ -209,7 +209,7 @@ export const createBillingPortalSession = mutationField("createBillingPortalSess
 
     const portalSession = await stripe.billingPortal.sessions.create({
       customer: userProject.project.externalBillingId,
-      return_url: `${process.env.NEXTAUTH_URL}/app`,
+      return_url: `${process.env.BASE_URL}/app`,
     });
 
     return portalSession.url;

@@ -15,8 +15,7 @@ import { useRouter } from "next/router";
 import React from "react";
 import prisma from "src/db/prisma/client";
 import { plans } from "@server/services/stripe/plans";
-import Link from "next/link";
-import SettingsNav from "@client/components/dashboard/SettingsNav";
+import SettingsBreadcrumb from "@client/components/dashboard/SettingsBreadcrumb";
 
 function BillingButton({ children, projectId }: { children: React.ReactNode; projectId: string }) {
   const [, createPortalSession] = useCreateBillingPortalSessionMutation();
@@ -97,34 +96,39 @@ const settings = ({
 
   return (
     <Layout>
-      <SettingsNav />
+      <div className="p-4">
+        <div className="mb-3">
+          <SettingsBreadcrumb path={[{ title: "Billing & plan" }]} />
 
-      <h1 className="text-3xl p-4 font-semibold"> Settings page for {project.name}</h1>
+          <h1 className="text-2xl font-bold mt-4">Billing</h1>
+          <p className="text-sm text-gray-600">Billing & plan details for {project.name}</p>
+        </div>
 
-      <div className="pt-8">
-        {!isActive && <SubscribeButton projectId={project.id}>Upgrade</SubscribeButton>}
-        {isActive && <BillingButton projectId={project.id}>Billing</BillingButton>}
-      </div>
+        <div className="pt-8">
+          {!isActive && <SubscribeButton projectId={project.id}>Upgrade</SubscribeButton>}
+          {isActive && <BillingButton projectId={project.id}>Billing</BillingButton>}
+        </div>
 
-      <div className="pt-8">
-        <h1 className="text-3xl p-4 font-semibold">Upgrade Plan</h1>
+        <div className="pt-8">
+          <h1 className="text-3xl p-4 font-semibold">Upgrade Plan</h1>
 
-        <div>
-          {Object.keys(plans).map((name) => {
-            const price = plans[name as keyof typeof plans];
-            const isSelected = sub?.externalProductId === price;
+          <div>
+            {Object.keys(plans).map((name) => {
+              const price = plans[name as keyof typeof plans];
+              const isSelected = sub?.externalProductId === price;
 
-            return (
-              <Button
-                key={name}
-                type={isSelected ? "primary" : "secondary"}
-                className="mx-1 capitalize"
-                onClick={() => handleSubscriptionChange(name)}
-              >
-                {name}
-              </Button>
-            );
-          })}
+              return (
+                <Button
+                  key={name}
+                  type={isSelected ? "primary" : "secondary"}
+                  className="mx-1 capitalize"
+                  onClick={() => handleSubscriptionChange(name)}
+                >
+                  {name}
+                </Button>
+              );
+            })}
+          </div>
         </div>
       </div>
     </Layout>

@@ -1,8 +1,30 @@
 import { logger } from "@server/logging";
 import { UserInputError } from "apollo-server-micro";
-import { mutationField, nonNull, stringArg } from "nexus";
+import { mutationField, nonNull, stringArg, list, enumType, arg } from "nexus";
 import { AuthenticatedUserContext } from "src/server/graphql/context";
 import { isAuthenticated } from "../auth";
+
+const userRoles = ["ADMIN", "USER"];
+
+export const UserRole = enumType({
+  name: "UserRole",
+  members: userRoles,
+});
+
+export const inviteMembersToProject = mutationField("inviteMembersToProject", {
+  type: "Boolean",
+  args: {
+    role: arg({ type: UserRole }),
+    emails: list(stringArg()),
+  },
+  // TODO: check if user is admin of project
+  authorize: isAuthenticated,
+  async resolve(root, { projectId }, ctx: AuthenticatedUserContext) {
+    
+    console.log(ctx.user, ctx);
+    return true;
+  },
+});
 
 export const changeSessionProject = mutationField("changeSessionProject", {
   type: "Boolean",

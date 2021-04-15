@@ -33,6 +33,7 @@ export interface NexusGenInputs {
 
 export interface NexusGenEnums {
   PaidPlan: "advanced" | "basic" | "pro"
+  UserRole: "ADMIN" | "USER"
 }
 
 export interface NexusGenScalars {
@@ -82,6 +83,7 @@ export interface NexusGenFieldTypes {
     createCheckoutSession: string | null; // String
     createProject: NexusGenRootTypes['Project'] | null; // Project
     deleteProject: boolean | null; // Boolean
+    inviteMembersToProject: boolean | null; // Boolean
     updateProject: NexusGenRootTypes['Project'] | null; // Project
   }
   Project: { // field return type
@@ -98,6 +100,7 @@ export interface NexusGenFieldTypes {
   Query: { // field return type
     currentUser: NexusGenRootTypes['User'] | null; // User
     project: NexusGenRootTypes['Project'] | null; // Project
+    projectUsers: Array<NexusGenRootTypes['User'] | null> | null; // [User]
     projects: Array<NexusGenRootTypes['Project'] | null> | null; // [Project]
   }
   Subscription: { // field return type
@@ -122,6 +125,7 @@ export interface NexusGenFieldTypeNames {
     createCheckoutSession: 'String'
     createProject: 'Project'
     deleteProject: 'Boolean'
+    inviteMembersToProject: 'Boolean'
     updateProject: 'Project'
   }
   Project: { // field return type name
@@ -138,6 +142,7 @@ export interface NexusGenFieldTypeNames {
   Query: { // field return type name
     currentUser: 'User'
     project: 'Project'
+    projectUsers: 'User'
     projects: 'Project'
   }
   Subscription: { // field return type name
@@ -176,6 +181,10 @@ export interface NexusGenArgTypes {
     deleteProject: { // args
       id: string; // String!
     }
+    inviteMembersToProject: { // args
+      emails?: Array<string | null> | null; // [String]
+      role?: NexusGenEnums['UserRole'] | null; // UserRole
+    }
     updateProject: { // args
       id: string; // String!
       name: string; // String!
@@ -198,6 +207,9 @@ export interface NexusGenArgTypes {
   Query: {
     project: { // args
       id?: string | null; // String
+    }
+    projectUsers: { // args
+      projectId: string; // String!
     }
   }
   User: {

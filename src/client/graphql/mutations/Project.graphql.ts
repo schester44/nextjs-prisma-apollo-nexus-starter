@@ -1,5 +1,15 @@
 import { gql } from "urql";
 
+export const projectUsers = gql`
+  query projectUsers($projectId: String!) {
+    projectUsers(projectId: $projectId) {
+      id
+      name
+      email
+    }
+  }
+`;
+
 export const createProjectMutation = gql`
   mutation createProject($name: String!) {
     createProject(name: $name) {

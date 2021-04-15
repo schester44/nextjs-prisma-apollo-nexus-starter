@@ -84,11 +84,14 @@ const ProjectDropdown = ({
                                   "text-gray-700 text-lg flex items-center justify-between w-full rounded p-1",
                                   {
                                     "bg-gray-50": !isSelected && active,
-                                    "cursor-default": isSelected,
+                                    "cursor-default focus:outline-none": isSelected,
                                     "mb-2": index !== projects.length - 1,
                                   }
                                 )}
-                                onClick={() => !isSelected && handleProjectSelection(project)}
+                                onClick={() => {
+                                  if (isSelected) return;
+                                  handleProjectSelection(project);
+                                }}
                               >
                                 <div className="flex items-center">
                                   <div className="rounded w-7 h-7 bg-indigo-400 text-white mr-3 shadow flex items-center justify-center uppercase">

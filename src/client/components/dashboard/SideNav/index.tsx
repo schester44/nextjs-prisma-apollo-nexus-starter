@@ -46,7 +46,7 @@ const SideNav = ({ projects, activeProject }: SideNavProps) => {
 
         <NavMenuItem
           label="Settings"
-          href="/app/settings/user"
+          href="/app/settings"
           icon={<BiCog className="text-lg" />}
         />
       </div>

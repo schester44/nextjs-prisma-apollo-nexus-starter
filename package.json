@@ -7,7 +7,9 @@
   },
   "scripts": {
     "build": "next build",
-    "dev": "TAILWIND_MODE=watch concurrently -r \"npx next\" \"yarn watch:graphql-codegen\"",
+    "start:dev": "TAILWIND_MODE=watch concurrently -r \"next\" \"yarn watch:graphql-codegen\"",
+    "start:test": "NODE_ENV=test next",
+    "start:prod": "next start",
     "generate": "yarn generate:prisma && yarn generate:nexus && yarn generate:graphql-codegen",
     "generate:prisma": "prisma generate",
     "generate:nexus": "ts-node --transpile-only -P nexus.tsconfig.json -r tsconfig-paths/register src/server/graphql/schema.ts",
@@ -15,12 +17,12 @@
     "lint": "eslint --ext js,jsx,ts,tsx",
     "migrate:dev": "prisma migrate dev",
     "seed:dev": "prisma db seed --preview-feature",
-    "start": "next start",
-    "start:stripe": "stripe listen --forward-to localhost:3000/api/webhooks",
+    "stripe-listen": "stripe listen --forward-to localhost:3000/api/webhooks",
     "type-check": "tsc --project tsconfig.json --pretty --noEmit",
     "watch:graphql-codegen": "yarn wait-on http://localhost:3000 && graphql-codegen --watch",
     "test:server": "echo 'not yet implemented'",
-    "test:client": "echo 'not yet implemented'"
+    "test:client": "cypress open",
+    "test:ci:client": "cypress run"
   },
   "dependencies": {
     "@headlessui/react": "^1.0.0",
@@ -86,6 +88,7 @@
     "@types/react": "^17.0.3",
     "@typescript-eslint/eslint-plugin": "^4.18.0",
     "@typescript-eslint/parser": "^4.18.0",
+    "cypress": "^7.1.0",
     "eslint": "^7.22.0",
     "eslint-config-prettier": "^8.1.0",
     "eslint-plugin-jsx-a11y": "^6.4.1",

@@ -11,6 +11,7 @@ type Mutation {
   createCheckoutSession(plan: String!, projectId: String!): String
   createProject(name: String!): Project
   deleteProject(id: String!): Boolean
+  inviteMembersToProject(emails: [String], role: UserRole): Boolean
   updateProject(id: String!, name: String!): Project
 }
 
@@ -45,6 +46,7 @@ input ProjectUsersWhereUniqueInput {
 type Query {
   currentUser: User
   project(id: String): Project
+  projectUsers(projectId: String!): [User]
   projects: [Project]
 }
 
@@ -64,4 +66,9 @@ type User {
   id: Int!
   name: String
   projects(after: ProjectUsersWhereUniqueInput, before: ProjectUsersWhereUniqueInput, first: Int, last: Int): [ProjectUsers!]!
+}
+
+enum UserRole {
+  ADMIN
+  USER
 }

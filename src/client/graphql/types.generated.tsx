@@ -18,8 +18,14 @@ export type Scalars = {
 export type Query = {
   __typename?: 'Query';
   currentUser?: Maybe<User>;
+  projectUsers?: Maybe<Array<Maybe<User>>>;
   projects?: Maybe<Array<Maybe<Project>>>;
   project?: Maybe<Project>;
+};
+
+
+export type QueryProjectUsersArgs = {
+  projectId: Scalars['String'];
 };
 
 
@@ -29,6 +35,7 @@ export type QueryProjectArgs = {
 
 export type Mutation = {
   __typename?: 'Mutation';
+  inviteMembersToProject?: Maybe<Scalars['Boolean']>;
   changeSessionProject?: Maybe<Scalars['Boolean']>;
   createProject?: Maybe<Project>;
   updateProject?: Maybe<Project>;
@@ -36,6 +43,12 @@ export type Mutation = {
   changeSubscriptionPlan?: Maybe<Scalars['Boolean']>;
   createCheckoutSession?: Maybe<Scalars['String']>;
   createBillingPortalSession?: Maybe<Scalars['String']>;
+};
+
+
+export type MutationInviteMembersToProjectArgs = {
+  role?: Maybe<UserRole>;
+  emails?: Maybe<Array<Maybe<Scalars['String']>>>;
 };
 
 
@@ -97,6 +110,11 @@ export type UserProjectsArgs = {
   before?: Maybe<ProjectUsersWhereUniqueInput>;
   after?: Maybe<ProjectUsersWhereUniqueInput>;
 };
+
+export enum UserRole {
+  Admin = 'ADMIN',
+  User = 'USER'
+}
 
 export enum PaidPlan {
   Basic = 'basic',
@@ -183,6 +201,19 @@ export type ChangeSubscriptionPlanMutation = (
   & Pick<Mutation, 'changeSubscriptionPlan'>
 );
 
+export type ProjectUsersQueryVariables = Exact<{
+  projectId: Scalars['String'];
+}>;
+
+
+export type ProjectUsersQuery = (
+  { __typename?: 'Query' }
+  & { projectUsers?: Maybe<Array<Maybe<(
+    { __typename?: 'User' }
+    & Pick<User, 'id' | 'name' | 'email'>
+  )>>> }
+);
+
 export type CreateProjectMutationVariables = Exact<{
   name: Scalars['String'];
 }>;
@@ -228,6 +259,30 @@ export type ChangeSessionProjectMutationVariables = Exact<{
 export type ChangeSessionProjectMutation = (
   { __typename?: 'Mutation' }
   & Pick<Mutation, 'changeSessionProject'>
+);
+
+export type InviteMembersToProjectMutationVariables = Exact<{
+  emails: Array<Maybe<Scalars['String']>> | Maybe<Scalars['String']>;
+  role: UserRole;
+}>;
+
+
+export type InviteMembersToProjectMutation = (
+  { __typename?: 'Mutation' }
+  & Pick<Mutation, 'inviteMembersToProject'>
+);
+
+export type ProjectUsersQueryQueryVariables = Exact<{
+  projectId: Scalars['String'];
+}>;
+
+
+export type ProjectUsersQueryQuery = (
+  { __typename?: 'Query' }
+  & { projectUsers?: Maybe<Array<Maybe<(
+    { __typename?: 'User' }
+    & Pick<User, 'id' | 'name' | 'email'>
+  )>>> }
 );
 
 export type GetProjectQueryQueryVariables = Exact<{
@@ -304,6 +359,19 @@ export const ChangeSubscriptionPlanDocument = gql`
 export function useChangeSubscriptionPlanMutation() {
   return Urql.useMutation<ChangeSubscriptionPlanMutation, ChangeSubscriptionPlanMutationVariables>(ChangeSubscriptionPlanDocument);
 };
+export const ProjectUsersDocument = gql`
+    query projectUsers($projectId: String!) {
+  projectUsers(projectId: $projectId) {
+    id
+    name
+    email
+  }
+}
+    `;
+
+export function useProjectUsersQuery(options: Omit<Urql.UseQueryArgs<ProjectUsersQueryVariables>, 'query'> = {}) {
+  return Urql.useQuery<ProjectUsersQuery>({ query: ProjectUsersDocument, ...options });
+};
 export const CreateProjectDocument = gql`
     mutation createProject($name: String!) {
   createProject(name: $name) {
@@ -345,6 +413,28 @@ export const ChangeSessionProjectDocument = gql`
 
 export function useChangeSessionProjectMutation() {
   return Urql.useMutation<ChangeSessionProjectMutation, ChangeSessionProjectMutationVariables>(ChangeSessionProjectDocument);
+};
+export const InviteMembersToProjectDocument = gql`
+    mutation inviteMembersToProject($emails: [String]!, $role: UserRole!) {
+  inviteMembersToProject(emails: $emails, role: $role)
+}
+    `;
+
+export function useInviteMembersToProjectMutation() {
+  return Urql.useMutation<InviteMembersToProjectMutation, InviteMembersToProjectMutationVariables>(InviteMembersToProjectDocument);
+};
+export const ProjectUsersQueryDocument = gql`
+    query projectUsersQuery($projectId: String!) {
+  projectUsers(projectId: $projectId) {
+    id
+    name
+    email
+  }
+}
+    `;
+
+export function useProjectUsersQueryQuery(options: Omit<Urql.UseQueryArgs<ProjectUsersQueryQueryVariables>, 'query'> = {}) {
+  return Urql.useQuery<ProjectUsersQueryQuery>({ query: ProjectUsersQueryDocument, ...options });
 };
 export const GetProjectQueryDocument = gql`
     query getProjectQuery($id: String!) {

@@ -37,7 +37,7 @@ const EditProjectModal = ({ project, onClose, open = true }: Props) => {
             leaveFrom="opacity-100"
             leaveTo="opacity-0"
           >
-            <Dialog.Overlay className="fixed inset-0" />
+            <Dialog.Overlay className="fixed inset-0 bg-gray-400 opacity-50" />
           </Transition.Child>
         </div>
 
@@ -50,7 +50,7 @@ const EditProjectModal = ({ project, onClose, open = true }: Props) => {
           leaveFrom="opacity-100 scale-100"
           leaveTo="opacity-0 scale-95"
         >
-          <div className="inline-block w-full max-w-md p-6 my-8 overflow-hidden text-left align-middle transition-all transform bg-white shadow-xl rounded-2xl">
+          <div className="inline-block w-full max-w-md p-6 my-8 overflow-hidden text-left align-middle transition-all transform bg-white shadow-xl rounded">
             <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
               <Dialog.Title className="text-lg leading-6 font-medium text-gray-900">
                 Edit Project Name

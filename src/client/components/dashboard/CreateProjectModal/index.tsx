@@ -37,7 +37,7 @@ const CreateProjectModal = ({ onClose, open = true }: Props) => {
             leave="ease-in duration-200"
             leaveTo="opacity-0"
           >
-            <Dialog.Overlay className="fixed inset-0 bg-gray-100 opacity-50" />
+            <Dialog.Overlay className="fixed inset-0 bg-gray-400 opacity-50" />
           </Transition.Child>
         </div>
 
@@ -51,7 +51,7 @@ const CreateProjectModal = ({ onClose, open = true }: Props) => {
           leaveFrom="transform scale-100"
           leaveTo="transform scale-95"
         >
-          <div className="inline-block w-full max-w-md p-6 my-8 overflow-hidden text-left align-middle transition-all transform bg-white shadow-xl rounded-2xl">
+          <div className="inline-block w-full max-w-md p-6 my-8 overflow-hidden text-left align-middle transition-all transform bg-white shadow-xl rounded">
             <div>
               <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
                 <h3 className="text-lg leading-6 font-medium text-gray-900">Create Project</h3>

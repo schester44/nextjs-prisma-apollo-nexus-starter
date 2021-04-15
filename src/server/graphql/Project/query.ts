@@ -1,9 +1,30 @@
 import { extendType } from "@nexus/schema";
 import { AuthenticationError, UserInputError } from "apollo-server-errors";
-import { stringArg } from "nexus";
+import { arg, nonNull, queryField, stringArg } from "nexus";
 import { AuthenticatedUserContext, Context } from "src/server/graphql/context";
 import { isAuthenticated } from "../auth";
 import { logger } from "src/server/logging";
+
+export const projectUsers = extendType({
+  type: "Query",
+  definition(t) {
+    t.list.field("projectUsers", {
+      type: "User",
+      args: {
+        projectId: nonNull(stringArg()),
+      },
+      // authorize: isAuthenticated,
+      async resolve(parent, { projectId }, ctx: AuthenticatedUserContext) {
+        const users = await ctx.prisma.projectUsers.findMany({
+          where: { projectId },
+          include: { user: true },
+        });
+
+        return users.map(({ user }) => user);
+      },
+    });
+  },
+});
 
 export const projects = extendType({
   type: "Query",
