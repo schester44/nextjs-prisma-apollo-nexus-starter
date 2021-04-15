@@ -11,21 +11,6 @@ export const UserRole = enumType({
   members: userRoles,
 });
 
-export const inviteMembersToProject = mutationField("inviteMembersToProject", {
-  type: "Boolean",
-  args: {
-    role: arg({ type: UserRole }),
-    emails: list(stringArg()),
-  },
-  // TODO: check if user is admin of project
-  authorize: isAuthenticated,
-  async resolve(root, { projectId }, ctx: AuthenticatedUserContext) {
-    
-    console.log(ctx.user, ctx);
-    return true;
-  },
-});
-
 export const changeSessionProject = mutationField("changeSessionProject", {
   type: "Boolean",
   args: {

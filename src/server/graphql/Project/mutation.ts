@@ -1,8 +1,23 @@
+import { UserRole } from "@client/graphql/types.generated";
 import { logger } from "@server/logging";
 import { UserInputError } from "apollo-server-micro";
-import { mutationField, nonNull, stringArg } from "nexus";
-import { AuthenticatedUserContext } from "src/server/graphql/context";
+import { arg, list, mutationField, nonNull, stringArg } from "nexus";
+import { AuthenticatedUserContext } from "@server/graphql/context";
 import { isAuthenticated } from "../auth";
+
+export const inviteMembersToProject = mutationField("inviteMembersToProject", {
+  type: "Boolean",
+  args: {
+    role: arg({ type: UserRole }),
+    emails: list(stringArg()),
+  },
+  // TODO: check if user is admin of project
+  authorize: isAuthenticated,
+  async resolve(root, { projectId }, ctx: AuthenticatedUserContext) {
+    // TODO: How to implement so that it works with all nextauth providers
+    return true;
+  },
+});
 
 export const createProject = mutationField("createProject", {
   type: "Project",
