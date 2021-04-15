@@ -10,7 +10,7 @@
     "dev": "TAILWIND_MODE=watch concurrently -r \"npx next\" \"yarn watch:graphql-codegen\"",
     "generate": "yarn generate:prisma && yarn generate:nexus && yarn generate:graphql-codegen",
     "generate:prisma": "prisma generate",
-    "generate:nexus": "ts-node --transpile-only -P nexus.tsconfig.json src/server/graphql/schema.ts",
+    "generate:nexus": "ts-node --transpile-only -P nexus.tsconfig.json -r tsconfig-paths/register src/server/graphql/schema.ts",
     "generate:graphql-codegen": "graphql-codegen",
     "lint": "eslint --ext js,jsx,ts,tsx",
     "migrate:dev": "prisma migrate dev",
@@ -18,7 +18,9 @@
     "start": "next start",
     "start:stripe": "stripe listen --forward-to localhost:3000/api/webhooks",
     "type-check": "tsc --project tsconfig.json --pretty --noEmit",
-    "watch:graphql-codegen": "yarn wait-on http://localhost:3000 && graphql-codegen --watch"
+    "watch:graphql-codegen": "yarn wait-on http://localhost:3000 && graphql-codegen --watch",
+    "test:server": "echo 'not yet implemented'",
+    "test:client": "echo 'not yet implemented'"
   },
   "dependencies": {
     "@headlessui/react": "^1.0.0",
@@ -94,6 +96,7 @@
     "lint-staged": "^10.5.4",
     "prettier": "^2.2.1",
     "prisma": "2.19.0",
+    "tsconfig-paths": "^3.9.0",
     "typescript": "^4.2.3"
   }
 }

@@ -1,5 +1,11 @@
 {
   "compilerOptions": {
+    "paths": {
+      "@client/*": ["src/client/*"],
+      "@server/*": ["src/server/*"],
+      "@db/*": ["src/db/*"]
+    },
+    "baseUrl": ".",
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "module": "commonjs",

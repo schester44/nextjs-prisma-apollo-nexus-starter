@@ -1,7 +1,7 @@
 import { logger } from "@server/logging";
-import { AuthenticationError, UserInputError } from "apollo-server-micro";
+import { UserInputError } from "apollo-server-micro";
 import { mutationField, nonNull, stringArg } from "nexus";
-import { AuthenticatedUserContext, Context } from "src/server/graphql/context";
+import { AuthenticatedUserContext } from "src/server/graphql/context";
 import { isAuthenticated } from "../auth";
 
 export const createProject = mutationField("createProject", {

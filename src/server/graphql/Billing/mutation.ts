@@ -1,10 +1,10 @@
 import { mutationField, nonNull, stringArg } from "nexus";
 import { stripe, plans } from "../../services/stripe";
 
-import { AuthenticatedUserContext, Context } from "../../graphql/context";
+import { AuthenticatedUserContext } from "../../graphql/context";
 import prisma from "../../../db/prisma/client";
 
-import { AuthenticationError, UserInputError } from "apollo-server-micro";
+import { UserInputError } from "apollo-server-micro";
 import { isAuthenticated } from "../auth";
 import { logger } from "@server/logging";
 
@@ -203,7 +203,7 @@ export const createBillingPortalSession = mutationField("createBillingPortalSess
       logger.error(
         `User ${ctx.user.id} tried to access the billing portal for a project (${projectId}) that is not paid for.`
       );
-      
+
       throw new UserInputError("Non-existent project");
     }
 
