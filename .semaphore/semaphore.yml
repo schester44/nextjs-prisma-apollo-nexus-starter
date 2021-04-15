@@ -1,5 +1,5 @@
 version: v1.0
-name: Starter App
+name: SC App
 agent:
   machine:
     type: e1-standard-2
@@ -18,7 +18,7 @@ blocks:
       env_vars:
         - name: NODE_ENV
           value: test
-  - name: Run Specs
+  - name: Test
     task:
       env_vars:
         - name: NODE_ENV
@@ -34,7 +34,7 @@ blocks:
           - cache restore
           - yarn install
           - sem-service start postgres 12
-          - createdb -U postgres -h 0.0.0.0 obie_test
+          - createdb -U postgres -h 0.0.0.0 sc_test
           - psql -U postgres -h localhost -c "CREATE USER testing WITH PASSWORD 'testing';"
           - psql -U postgres -h localhost -c "ALTER USER testing WITH SUPERUSER;"
           - yarn migrate:test
@@ -49,7 +49,7 @@ blocks:
           commands:
             - yarn cypress install
             - yarn cypress verify
-            - mv api/.env-sample api/.env
+            - mv .env-example .env
             - yarn start:test &
             - yarn client:e2e
     dependencies:
