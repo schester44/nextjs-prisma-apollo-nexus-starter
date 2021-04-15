@@ -8,16 +8,18 @@ blocks:
   - name: Install
     task:
       jobs:
-        - name: "Yarn Install"
+        - name: Yarn Install
           commands:
             - checkout
             - sem-version node 12.16
             - cache restore
             - yarn install
             - cache store
+            - mv .env-example .env
       env_vars:
         - name: NODE_ENV
           value: test
+    dependencies: []
   - name: Test
     task:
       env_vars:
@@ -37,21 +39,20 @@ blocks:
           - createdb -U postgres -h 0.0.0.0 sc_test
           - psql -U postgres -h localhost -c "CREATE USER testing WITH PASSWORD 'testing';"
           - psql -U postgres -h localhost -c "ALTER USER testing WITH SUPERUSER;"
-          - yarn migrate:test
+          - 'yarn migrate:test'
       jobs:
         - name: Run Server Tests
           commands:
-            - yarn server:ci
+            - 'yarn server:ci'
         - name: Run Client Tests
           commands:
-            - yarn client:ci
+            - 'yarn client:ci'
         - name: Run E2E Specs
           commands:
             - yarn cypress install
             - yarn cypress verify
-            - mv .env-example .env
-            - yarn start:test &
-            - yarn client:e2e
+            - 'yarn start:test &'
+            - 'yarn client:e2e'
     dependencies:
       - Install
   - name: Build
