@@ -183,7 +183,7 @@ export interface NexusGenArgTypes {
     }
     inviteMembersToProject: { // args
       emails?: Array<string | null> | null; // [String]
-      role?: NexusGenEnums['UserRole'] | null; // UserRole
+      role?: NexusGenScalars['NEXUS__UNKNOWN__TYPE'] | null; // NEXUS__UNKNOWN__TYPE
     }
     updateProject: { // args
       id: string; // String!

@@ -11,9 +11,18 @@ type Mutation {
   createCheckoutSession(plan: String!, projectId: String!): String
   createProject(name: String!): Project
   deleteProject(id: String!): Boolean
-  inviteMembersToProject(emails: [String], role: UserRole): Boolean
+  inviteMembersToProject(emails: [String], role: NEXUS__UNKNOWN__TYPE): Boolean
   updateProject(id: String!, name: String!): Project
 }
+
+"""
+
+    This scalar should never make it into production. It is used as a placeholder for situations
+    where GraphQL Nexus encounters a missing type. We don't want to error immediately, otherwise
+    the TypeScript definitions will not be updated.
+  
+"""
+scalar NEXUS__UNKNOWN__TYPE
 
 enum PaidPlan {
   advanced
