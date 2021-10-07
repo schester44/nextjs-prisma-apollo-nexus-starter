@@ -5,9 +5,3 @@ export const changeSessionProject = gql`
     changeSessionProject(projectId: $projectId)
   }
 `;
-
-export const inviteMembersToProject = gql`
-  mutation inviteMembersToProject($emails: [String]!, $role: UserRole!) {
-    inviteMembersToProject(emails: $emails, role: $role)
-  }
-`;

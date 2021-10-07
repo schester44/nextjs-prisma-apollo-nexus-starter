@@ -1,20 +1,87 @@
-import { UserRole } from "@server/graphql/User/mutation";
 import { logger } from "@server/logging";
 import { UserInputError } from "apollo-server-micro";
-import { arg, list, mutationField, nonNull, stringArg } from "nexus";
+import { mutationField, nonNull, stringArg } from "nexus";
 import { AuthenticatedUserContext } from "@server/graphql/context";
 import { isAuthenticated } from "../auth";
 
-export const inviteMembersToProject = mutationField("inviteMembersToProject", {
+// Send invite url
+// user loads url, sees invited from, do you want to accept?
+// user accepts, we generate JWT/session, and log them in
+
+export const inviteUserToProject = mutationField("inviteUserToProject", {
   type: "Boolean",
   args: {
-    role: arg({ type: UserRole }),
-    emails: list(stringArg()),
+    projectId: nonNull(stringArg()),
+    email: nonNull(stringArg()),
+    name: nonNull(stringArg()),
   },
   // TODO: check if user is admin of project
   authorize: isAuthenticated,
-  async resolve(root, { projectId }, ctx: AuthenticatedUserContext) {
-    // TODO: How to implement so that it works with all nextauth providers
+  async resolve(root, { projectId, email, name }, ctx) {
+    const projectOwnedByUser = await ctx.prisma.projectUsers.findFirst({
+      where: {
+        projectId,
+        userId: ctx.user.id,
+      },
+      include: {
+        project: true,
+      },
+    });
+
+    if (!projectOwnedByUser) {
+      throw new UserInputError("No project found");
+    }
+
+    // TODO: Check if the user already exists on the project
+    let user = await ctx.prisma.user.findFirst({
+      where: {
+        email,
+      },
+    });
+
+    if (user) {
+      const userHasAlreadyBeenInvited = await ctx.prisma.userInvites.findFirst({
+        where: {
+          projectId,
+          user,
+        },
+      });
+
+      if (userHasAlreadyBeenInvited) {
+        throw new UserInputError("User has already been invited");
+      }
+
+      const userIsAlreadyATeamMember = await ctx.prisma.projectUsers.findFirst({
+        where: {
+          projectId,
+          user,
+        },
+      });
+
+      if (userIsAlreadyATeamMember) {
+        throw new UserInputError("User is already a team member");
+      }
+    }
+
+    if (!user) {
+      user = await ctx.prisma.user.create({
+        data: {
+          email,
+          name,
+        },
+      });
+    }
+
+    const invite = await ctx.prisma.userInvites.create({
+      data: {
+        projectId,
+        userId: user.id,
+        invitedByUserId: ctx.user.id,
+      },
+    });
+
+    console.log({ invite });
+    
     return true;
   },
 });

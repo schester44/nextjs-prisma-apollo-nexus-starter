@@ -57,7 +57,25 @@ model User {
   updatedAt     DateTime       @default(now()) @map(name: "updated_at")
   projects      ProjectUsers[]
 
+  ProjectInvites UserInvites? @relation("user")
+  UsersInvited   UserInvites? @relation("invitedBy")
+
   @@map(name: "users")
+}
+
+model UserInvites {
+  id              Int      @id @default(autoincrement())
+  user            User     @relation("user", fields: [userId], references: [id])
+  createdAt       DateTime @default(now()) @map(name: "created_at")
+  userId          Int
+  projectId       String
+  accepted        Boolean  @default(false)
+  invitedByUserId Int
+  invitedBy       User     @relation("invitedBy", fields: [invitedByUserId], references: [id])
+
+
+
+  @@unique([projectId, userId])
 }
 
 model VerificationRequest {

@@ -23,7 +23,7 @@ export type Mutation = {
   createCheckoutSession?: Maybe<Scalars['String']>;
   createProject?: Maybe<Project>;
   deleteProject?: Maybe<Scalars['Boolean']>;
-  inviteMembersToProject?: Maybe<Scalars['Boolean']>;
+  inviteUserToProject?: Maybe<Scalars['Boolean']>;
   updateProject?: Maybe<Project>;
 };
 
@@ -60,9 +60,10 @@ export type MutationDeleteProjectArgs = {
 };
 
 
-export type MutationInviteMembersToProjectArgs = {
-  emails?: Maybe<Array<Maybe<Scalars['String']>>>;
-  role?: Maybe<UserRole>;
+export type MutationInviteUserToProjectArgs = {
+  email: Scalars['String'];
+  name: Scalars['String'];
+  projectId: Scalars['String'];
 };
 
 
@@ -102,9 +103,15 @@ export type ProjectUsersArgs = {
   last?: Maybe<Scalars['Int']>;
 };
 
+export enum ProjectUserRole {
+  Admin = 'ADMIN',
+  User = 'USER'
+}
+
 export type ProjectUsers = {
   __typename?: 'ProjectUsers';
   project: Project;
+  role: ProjectUserRole;
   user: User;
 };
 
@@ -163,6 +170,12 @@ export type UserProjectsArgs = {
   last?: Maybe<Scalars['Int']>;
 };
 
+export type UserInvites = {
+  __typename?: 'UserInvites';
+  invitedBy: User;
+  user: User;
+};
+
 export enum UserRole {
   Admin = 'ADMIN',
   User = 'USER'
@@ -190,6 +203,15 @@ export type ChangeSubscriptionPlanMutationVariables = Exact<{
 
 
 export type ChangeSubscriptionPlanMutation = { __typename?: 'Mutation', changeSubscriptionPlan?: boolean | null | undefined };
+
+export type InviteUserToProjectMutationVariables = Exact<{
+  projectId: Scalars['String'];
+  name: Scalars['String'];
+  email: Scalars['String'];
+}>;
+
+
+export type InviteUserToProjectMutation = { __typename?: 'Mutation', inviteUserToProject?: boolean | null | undefined };
 
 export type ProjectUsersQueryVariables = Exact<{
   projectId: Scalars['String'];
@@ -226,14 +248,6 @@ export type ChangeSessionProjectMutationVariables = Exact<{
 
 
 export type ChangeSessionProjectMutation = { __typename?: 'Mutation', changeSessionProject?: boolean | null | undefined };
-
-export type InviteMembersToProjectMutationVariables = Exact<{
-  emails: Array<Maybe<Scalars['String']>> | Maybe<Scalars['String']>;
-  role: UserRole;
-}>;
-
-
-export type InviteMembersToProjectMutation = { __typename?: 'Mutation', inviteMembersToProject?: boolean | null | undefined };
 
 export type ProjectUsersQueryQueryVariables = Exact<{
   projectId: Scalars['String'];
@@ -286,6 +300,15 @@ export const ChangeSubscriptionPlanDocument = gql`
 
 export function useChangeSubscriptionPlanMutation() {
   return Urql.useMutation<ChangeSubscriptionPlanMutation, ChangeSubscriptionPlanMutationVariables>(ChangeSubscriptionPlanDocument);
+};
+export const InviteUserToProjectDocument = gql`
+    mutation inviteUserToProject($projectId: String!, $name: String!, $email: String!) {
+  inviteUserToProject(projectId: $projectId, name: $name, email: $email)
+}
+    `;
+
+export function useInviteUserToProjectMutation() {
+  return Urql.useMutation<InviteUserToProjectMutation, InviteUserToProjectMutationVariables>(InviteUserToProjectDocument);
 };
 export const ProjectUsersDocument = gql`
     query projectUsers($projectId: String!) {
@@ -341,15 +364,6 @@ export const ChangeSessionProjectDocument = gql`
 
 export function useChangeSessionProjectMutation() {
   return Urql.useMutation<ChangeSessionProjectMutation, ChangeSessionProjectMutationVariables>(ChangeSessionProjectDocument);
-};
-export const InviteMembersToProjectDocument = gql`
-    mutation inviteMembersToProject($emails: [String]!, $role: UserRole!) {
-  inviteMembersToProject(emails: $emails, role: $role)
-}
-    `;
-
-export function useInviteMembersToProjectMutation() {
-  return Urql.useMutation<InviteMembersToProjectMutation, InviteMembersToProjectMutationVariables>(InviteMembersToProjectDocument);
 };
 export const ProjectUsersQueryDocument = gql`
     query projectUsersQuery($projectId: String!) {

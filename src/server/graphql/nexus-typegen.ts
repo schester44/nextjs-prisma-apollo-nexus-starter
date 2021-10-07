@@ -34,6 +34,7 @@ export interface NexusGenInputs {
 
 export interface NexusGenEnums {
   PaidPlan: "advanced" | "basic" | "pro"
+  ProjectUserRole: "ADMIN" | "USER"
   UserRole: "ADMIN" | "USER"
 }
 
@@ -52,7 +53,9 @@ export interface NexusGenObjects {
     id: string; // String!
     name: string; // String!
   }
-  ProjectUsers: {};
+  ProjectUsers: { // root type
+    role: NexusGenEnums['ProjectUserRole']; // ProjectUserRole!
+  }
   Query: {};
   Subscription: { // root type
     endDate: NexusGenScalars['DateTime']; // DateTime!
@@ -64,6 +67,7 @@ export interface NexusGenObjects {
     id: number; // Int!
     name?: string | null; // String
   }
+  UserInvites: {};
 }
 
 export interface NexusGenInterfaces {
@@ -84,7 +88,7 @@ export interface NexusGenFieldTypes {
     createCheckoutSession: string | null; // String
     createProject: NexusGenRootTypes['Project'] | null; // Project
     deleteProject: boolean | null; // Boolean
-    inviteMembersToProject: boolean | null; // Boolean
+    inviteUserToProject: boolean | null; // Boolean
     updateProject: NexusGenRootTypes['Project'] | null; // Project
   }
   Project: { // field return type
@@ -96,6 +100,7 @@ export interface NexusGenFieldTypes {
   }
   ProjectUsers: { // field return type
     project: NexusGenRootTypes['Project']; // Project!
+    role: NexusGenEnums['ProjectUserRole']; // ProjectUserRole!
     user: NexusGenRootTypes['User']; // User!
   }
   Query: { // field return type
@@ -116,6 +121,10 @@ export interface NexusGenFieldTypes {
     name: string | null; // String
     projects: NexusGenRootTypes['ProjectUsers'][]; // [ProjectUsers!]!
   }
+  UserInvites: { // field return type
+    invitedBy: NexusGenRootTypes['User']; // User!
+    user: NexusGenRootTypes['User']; // User!
+  }
 }
 
 export interface NexusGenFieldTypeNames {
@@ -126,7 +135,7 @@ export interface NexusGenFieldTypeNames {
     createCheckoutSession: 'String'
     createProject: 'Project'
     deleteProject: 'Boolean'
-    inviteMembersToProject: 'Boolean'
+    inviteUserToProject: 'Boolean'
     updateProject: 'Project'
   }
   Project: { // field return type name
@@ -138,6 +147,7 @@ export interface NexusGenFieldTypeNames {
   }
   ProjectUsers: { // field return type name
     project: 'Project'
+    role: 'ProjectUserRole'
     user: 'User'
   }
   Query: { // field return type name
@@ -157,6 +167,10 @@ export interface NexusGenFieldTypeNames {
     id: 'Int'
     name: 'String'
     projects: 'ProjectUsers'
+  }
+  UserInvites: { // field return type name
+    invitedBy: 'User'
+    user: 'User'
   }
 }
 
@@ -182,9 +196,10 @@ export interface NexusGenArgTypes {
     deleteProject: { // args
       id: string; // String!
     }
-    inviteMembersToProject: { // args
-      emails?: Array<string | null> | null; // [String]
-      role?: NexusGenEnums['UserRole'] | null; // UserRole
+    inviteUserToProject: { // args
+      email: string; // String!
+      name: string; // String!
+      projectId: string; // String!
     }
     updateProject: { // args
       id: string; // String!

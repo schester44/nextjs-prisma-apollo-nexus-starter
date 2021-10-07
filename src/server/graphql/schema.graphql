@@ -11,7 +11,7 @@ type Mutation {
   createCheckoutSession(plan: String!, projectId: String!): String
   createProject(name: String!): Project
   deleteProject(id: String!): Boolean
-  inviteMembersToProject(emails: [String], role: UserRole): Boolean
+  inviteUserToProject(email: String!, name: String!, projectId: String!): Boolean
   updateProject(id: String!, name: String!): Project
 }
 
@@ -29,8 +29,14 @@ type Project {
   users(after: ProjectUsersWhereUniqueInput, before: ProjectUsersWhereUniqueInput, first: Int, last: Int): [ProjectUsers!]!
 }
 
+enum ProjectUserRole {
+  ADMIN
+  USER
+}
+
 type ProjectUsers {
   project: Project!
+  role: ProjectUserRole!
   user: User!
 }
 
@@ -66,6 +72,11 @@ type User {
   id: Int!
   name: String
   projects(after: ProjectUsersWhereUniqueInput, before: ProjectUsersWhereUniqueInput, first: Int, last: Int): [ProjectUsers!]!
+}
+
+type UserInvites {
+  invitedBy: User!
+  user: User!
 }
 
 enum UserRole {

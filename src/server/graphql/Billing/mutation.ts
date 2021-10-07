@@ -27,6 +27,8 @@ export const changeSubscriptionPlan = mutationField("changeSubscriptionPlan", {
 
     const selectedPlan = plans[plan as keyof typeof plans];
 
+    console.log(project, selectedPlan);
+
     if (!selectedPlan) {
       logger.error(
         `${ctx.user.id} tried to change their subscription plan to a plan that does not exist (${plan}) for project ID ${projectId}.`

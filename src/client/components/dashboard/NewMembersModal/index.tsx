@@ -1,20 +1,29 @@
 import React, { Fragment } from "react";
 import Button from "@client/components/dashboard/Button";
 import { Transition, Dialog } from "@headlessui/react";
+import { useInviteUserToProjectMutation } from "@client/graphql/types.generated";
 
 type Props = {
+  projectId: string;
   onClose: () => void;
   open?: boolean;
 };
 
-const NewMembersModal = ({ onClose, open = true }: Props) => {
-  // const [{ fetching }, addUsersToProject] = useCreateProjectMutation();
+const NewMembersModal = ({ projectId, open = true, onClose }: Props) => {
+  const [{ fetching }, inviteUser] = useInviteUserToProjectMutation();
+
   const [email, setEmail] = React.useState("");
+  const [name, setName] = React.useState("");
 
-  let fetching = false;
+  async function handleAction() {
+    const result = await inviteUser({
+      projectId,
+      email,
+      name,
+    });
 
-  function handleAction() {
-    // addUsersToProject({ emails: [email] });
+    console.log({ result });
+    // TODO: Show toast or errors
   }
 
   return (
@@ -50,12 +59,30 @@ const NewMembersModal = ({ onClose, open = true }: Props) => {
         >
           <div className="inline-block w-full max-w-md p-6 my-8 overflow-hidden text-left align-middle transition-all transform bg-white shadow-xl rounded">
             <Dialog.Title className="text-lg leading-none font-medium text-gray-900">
-              Invite new users
+              Invite a team member
             </Dialog.Title>
 
             <div className="py-5">
+              <label htmlFor="name" className="text-gray-400">
+                Name
+              </label>
               <input
-                aria-label="Team member email"
+                aria-label="Name"
+                name="name"
+                placeholder="Bob"
+                className=" appearance-none relative rounded block w-full px-4 py-3 border border-gray-300 placeholder-gray-400 text-gray-900 focus:outline-none focus:shadow-outline-blue focus:border-indigo-300 focus:z-10 sm:text-sm sm:leading-5"
+                value={name}
+                onChange={({ target: { value } }) => setName(value)}
+              />
+            </div>
+
+            <div className="pb-6">
+              <label htmlFor="email" className="text-gray-400">
+                Email
+              </label>
+
+              <input
+                aria-label="Email"
                 name="name"
                 placeholder="steve@gmail.com"
                 className=" appearance-none relative rounded block w-full px-4 py-3 border border-gray-300 placeholder-gray-400 text-gray-900 focus:outline-none focus:shadow-outline-blue focus:border-indigo-300 focus:z-10 sm:text-sm sm:leading-5"
@@ -73,7 +100,7 @@ const NewMembersModal = ({ onClose, open = true }: Props) => {
                 type="primary"
                 size="sm"
                 isLoading={fetching}
-                isDisabled={email.trim().length === 0 || !email.includes("@")}
+                isDisabled={email.trim().length === 0 || !email.includes("@") || name.length === 0}
                 className="ml-1"
                 onClick={handleAction}
               >

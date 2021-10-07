@@ -34,6 +34,10 @@ const emailServerConfig = {
   },
 };
 
+console.log({
+  emailServerConfig,
+});
+
 export default NextAuth({
   callbacks: {
     // FIXME:
@@ -71,7 +75,7 @@ export default NextAuth({
         }
 
         if (userSession) {
-          await  prisma.session.update({
+          await prisma.session.update({
             data: {
               currentProject: session.currentProject,
             },
