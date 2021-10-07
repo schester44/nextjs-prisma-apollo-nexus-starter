@@ -23,7 +23,7 @@ model ProjectUsers {
   userId    Int
   createdAt DateTime        @default(now())
 
-  @@id([projectId, userId])
+  @@unique([projectId, userId])
 }
 
 model Project {

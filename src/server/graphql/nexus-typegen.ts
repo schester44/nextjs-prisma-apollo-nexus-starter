@@ -4,7 +4,8 @@
  */
 
 
-import { FieldAuthorizeResolver } from "nexus/dist/plugins/fieldAuthorizePlugin"
+import type { Context } from "./context"
+import type { FieldAuthorizeResolver } from "nexus/dist/plugins/fieldAuthorizePlugin"
 
 
 declare global {
@@ -183,7 +184,7 @@ export interface NexusGenArgTypes {
     }
     inviteMembersToProject: { // args
       emails?: Array<string | null> | null; // [String]
-      role?: NexusGenScalars['NEXUS__UNKNOWN__TYPE'] | null; // NEXUS__UNKNOWN__TYPE
+      role?: NexusGenEnums['UserRole'] | null; // UserRole
     }
     updateProject: { // args
       id: string; // String!
@@ -253,7 +254,7 @@ export type NexusGenFeaturesConfig = {
 }
 
 export interface NexusGenTypes {
-  context: any;
+  context: Context;
   inputTypes: NexusGenInputs;
   rootTypes: NexusGenRootTypes;
   inputTypeShapes: NexusGenInputs & NexusGenEnums & NexusGenScalars;
@@ -281,6 +282,8 @@ export interface NexusGenTypes {
 
 declare global {
   interface NexusGenPluginTypeConfig<TypeName extends string> {
+  }
+  interface NexusGenPluginInputTypeConfig<TypeName extends string> {
   }
   interface NexusGenPluginFieldConfig<TypeName extends string, FieldName extends string> {
     /**

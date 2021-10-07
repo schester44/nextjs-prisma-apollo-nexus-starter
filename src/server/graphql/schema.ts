@@ -26,15 +26,15 @@ export const schema = makeSchema({
   },
   types: { resolvers },
   plugins: [fieldAuthorizePlugin(), nexusPrisma()],
+  contextType: {
+    module: path.join(outputPath, "context.ts"),
+    export: "Context",
+  },
   sourceTypes: {
     modules: [
       {
         module: "@prisma/client",
         alias: "prisma",
-      },
-      {
-        module: path.join(outputPath, "context.ts"),
-        alias: "Context",
       },
     ],
   },

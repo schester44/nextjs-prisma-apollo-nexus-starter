@@ -1,10 +1,11 @@
 import { ApolloServer } from "apollo-server-micro";
 import { schema } from "src/server/graphql/schema";
 import { createContext } from "src/server/graphql/context";
+import { MicroRequest } from "apollo-server-micro/dist/types";
+import { ServerResponse } from "http";
 
-const apolloServer = new ApolloServer({
+const server = new ApolloServer({
   schema,
-  playground: true,
   context: createContext,
 });
 
@@ -14,6 +15,11 @@ export const config = {
   },
 };
 
-export default apolloServer.createHandler({
-  path: "/api/graphql",
-});
+const startServer = server.start();
+
+export default async function handler(req: MicroRequest, res: ServerResponse) {
+  await startServer;
+  await server.createHandler({
+    path: "/api/graphql",
+  })(req, res);
+}

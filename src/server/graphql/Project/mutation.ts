@@ -1,4 +1,4 @@
-import { UserRole } from "@client/graphql/types.generated";
+import { UserRole } from "@server/graphql/User/mutation";
 import { logger } from "@server/logging";
 import { UserInputError } from "apollo-server-micro";
 import { arg, list, mutationField, nonNull, stringArg } from "nexus";
