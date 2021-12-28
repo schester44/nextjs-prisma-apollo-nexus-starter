@@ -16,7 +16,7 @@ const SideNav = ({ projects, activeProject }: SideNavProps) => {
   if (!activeProject) return null;
 
   return (
-    <div className="bg-gray-100 border-r h-full w-[300px] px-6 py-3">
+    <div className="bg-gray-100 h-full w-[300px] px-6 py-3">
       <ProjectDropdown activeProject={activeProject} projects={projects}>
         {({ open }) => {
           return (
