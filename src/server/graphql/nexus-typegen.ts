@@ -22,7 +22,7 @@ declare global {
 export interface NexusGenInputs {
   ProjectUsersProjectIdUserIdCompoundUniqueInput: { // input type
     projectId: string; // String!
-    userId: number; // Int!
+    userId: string; // String!
   }
   ProjectUsersWhereUniqueInput: { // input type
     projectId_userId?: NexusGenInputs['ProjectUsersProjectIdUserIdCompoundUniqueInput'] | null; // ProjectUsersProjectIdUserIdCompoundUniqueInput
@@ -64,7 +64,7 @@ export interface NexusGenObjects {
   }
   User: { // root type
     email?: string | null; // String
-    id: number; // Int!
+    id: string; // String!
     name?: string | null; // String
   }
   UserInvites: {};
@@ -117,7 +117,7 @@ export interface NexusGenFieldTypes {
   }
   User: { // field return type
     email: string | null; // String
-    id: number; // Int!
+    id: string; // String!
     name: string | null; // String
     projects: NexusGenRootTypes['ProjectUsers'][]; // [ProjectUsers!]!
   }
@@ -164,7 +164,7 @@ export interface NexusGenFieldTypeNames {
   }
   User: { // field return type name
     email: 'String'
-    id: 'Int'
+    id: 'String'
     name: 'String'
     projects: 'ProjectUsers'
   }

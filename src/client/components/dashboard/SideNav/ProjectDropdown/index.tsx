@@ -11,7 +11,7 @@ import Router from "next/router";
 
 import { Menu, Transition } from "@headlessui/react";
 import classNames from "classnames";
-import { signOut } from "next-auth/client";
+import { signOut } from "next-auth/react";
 import CreateProjectModal from "../../CreateProjectModal";
 import EditProjectModal from "../../EditProjectModal";
 

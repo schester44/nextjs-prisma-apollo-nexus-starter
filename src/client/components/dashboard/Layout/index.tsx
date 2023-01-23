@@ -1,5 +1,5 @@
 import React from "react";
-import { signIn, useSession } from "next-auth/client";
+import { signIn, useSession } from "next-auth/react";
 import { useEffect } from "react";
 import SideNav from "../SideNav";
 import { ProjectUsers, useGetCurrentUserQuery, User } from "@client/graphql/types.generated";
@@ -9,7 +9,9 @@ import { useActiveProject } from "@client/hooks/useActiveProject";
 type LayoutProps = { children: React.ReactNode };
 
 const Layout = ({ children }: LayoutProps) => {
-  const [session, loading] = useSession();
+  const { data: session, status } = useSession();
+
+  const loading = status === "loading";
 
   const [{ data, fetching }] = useGetCurrentUserQuery();
   const activeProject = useActiveProject();

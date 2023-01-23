@@ -1,6 +1,1 @@
-module.exports = {
-  experimental: {
-    concurrentFeatures: true,
-    serverComponents: true,
-  },
-};
+module.exports = {};

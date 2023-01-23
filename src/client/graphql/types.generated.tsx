@@ -117,7 +117,7 @@ export type ProjectUsers = {
 
 export type ProjectUsersProjectIdUserIdCompoundUniqueInput = {
   projectId: Scalars['String'];
-  userId: Scalars['Int'];
+  userId: Scalars['String'];
 };
 
 export type ProjectUsersWhereUniqueInput = {
@@ -157,7 +157,7 @@ export type SubscriptionWhereUniqueInput = {
 export type User = {
   __typename?: 'User';
   email?: Maybe<Scalars['String']>;
-  id: Scalars['Int'];
+  id: Scalars['String'];
   name?: Maybe<Scalars['String']>;
   projects: Array<ProjectUsers>;
 };
@@ -218,7 +218,7 @@ export type ProjectUsersQueryVariables = Exact<{
 }>;
 
 
-export type ProjectUsersQuery = { __typename?: 'Query', projectUsers?: Array<{ __typename?: 'User', id: number, name?: string | null | undefined, email?: string | null | undefined } | null | undefined> | null | undefined };
+export type ProjectUsersQuery = { __typename?: 'Query', projectUsers?: Array<{ __typename?: 'User', id: string, name?: string | null | undefined, email?: string | null | undefined } | null | undefined> | null | undefined };
 
 export type CreateProjectMutationVariables = Exact<{
   name: Scalars['String'];
@@ -254,7 +254,7 @@ export type ProjectUsersQueryQueryVariables = Exact<{
 }>;
 
 
-export type ProjectUsersQueryQuery = { __typename?: 'Query', projectUsers?: Array<{ __typename?: 'User', id: number, name?: string | null | undefined, email?: string | null | undefined } | null | undefined> | null | undefined };
+export type ProjectUsersQueryQuery = { __typename?: 'Query', projectUsers?: Array<{ __typename?: 'User', id: string, name?: string | null | undefined, email?: string | null | undefined } | null | undefined> | null | undefined };
 
 export type GetProjectQueryQueryVariables = Exact<{
   id: Scalars['String'];
@@ -271,7 +271,7 @@ export type UserProjectsQueryQuery = { __typename?: 'Query', projects?: Array<{ 
 export type GetCurrentUserQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetCurrentUserQuery = { __typename?: 'Query', currentUser?: { __typename?: 'User', id: number, name?: string | null | undefined, email?: string | null | undefined, projects: Array<{ __typename?: 'ProjectUsers', project: { __typename?: 'Project', id: string, name: string } }> } | null | undefined };
+export type GetCurrentUserQuery = { __typename?: 'Query', currentUser?: { __typename?: 'User', id: string, name?: string | null | undefined, email?: string | null | undefined, projects: Array<{ __typename?: 'ProjectUsers', project: { __typename?: 'Project', id: string, name: string } }> } | null | undefined };
 
 
 export const CreateCheckoutSessionDocument = gql`

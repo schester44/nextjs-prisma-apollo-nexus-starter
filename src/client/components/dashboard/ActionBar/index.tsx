@@ -1,9 +1,5 @@
 import React from "react";
-import { BiUser } from "react-icons/bi";
 import { User } from "@client/graphql/types.generated";
-import { signOut } from "next-auth/client";
-import Link from "next/link";
-import { Menu } from "@headlessui/react";
 
 const ActionBar = ({ user }: { user: User }) => {
   return (

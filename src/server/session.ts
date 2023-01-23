@@ -3,7 +3,7 @@ import prisma from "src/db/prisma/client";
 import { Session } from "next-auth";
 import { IncomingMessage } from "http";
 import { Project, ProjectUsers, User } from "@prisma/client";
-import { getSession } from "next-auth/client";
+import { getSession } from "next-auth/react";
 
 interface SessionWithCurrentProject extends Session {
   currentProject?: string;

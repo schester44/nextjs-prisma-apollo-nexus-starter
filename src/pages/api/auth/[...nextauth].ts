@@ -1,6 +1,6 @@
 import NextAuth, { User } from "next-auth";
-import Providers from "next-auth/providers";
-import Adapters from "next-auth/adapters";
+import EmailProvider from "next-auth/providers/email";
+import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import prisma from "src/db/prisma/client";
 import { JWT } from "next-auth/jwt";
 import moniker from "moniker";
@@ -34,10 +34,6 @@ const emailServerConfig = {
   },
 };
 
-console.log({
-  emailServerConfig,
-});
-
 export default NextAuth({
   callbacks: {
     // FIXME:
@@ -54,6 +50,10 @@ export default NextAuth({
     //@ts-ignore
     async session(session: Session & { currentProject: string }, user: User & { id: number }) {
       session.user.id = user.id;
+
+      console.log("SESSION", session, user);
+
+      // TOOD: session.accessToken doesn't exist so need to find the session a different way.
 
       const userSession = await prisma.session.findFirst({
         where: {
@@ -88,17 +88,14 @@ export default NextAuth({
 
       return Promise.resolve(session);
     },
-    async redirect(url, baseUrl) {
-      return url.startsWith(baseUrl) ? url : baseUrl;
-    },
   },
   // Configure one or more authentication providers #ref https://next-auth.js.org/providers/email
   providers: [
-    Providers.Email({
+    EmailProvider({
       server: emailServerConfig,
       from: process.env.EMAIL_FROM,
     }),
   ],
   // DB Adapter #ref https://next-auth.js.org/schemas/adapters#prisma-adapter
-  adapter: Adapters.Prisma.Adapter({ prisma }),
+  adapter: PrismaAdapter(prisma),
 });

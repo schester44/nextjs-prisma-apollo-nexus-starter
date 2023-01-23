@@ -4,7 +4,7 @@ import { getSessionProject } from "src/server/session";
 import { NextPageContext } from "next";
 import { useRouter } from "next/router";
 import React from "react";
-import { getSession } from "next-auth/client";
+import { getSession } from "next-auth/react";
 
 const AppIndex = ({ user, project }: { user: User; project: Project | undefined }) => {
   const router = useRouter();

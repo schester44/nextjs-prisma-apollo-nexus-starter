@@ -5,7 +5,7 @@ import SettingsBreadcrumb from "@client/components/dashboard/SettingsBreadcrumb"
 import { Project, ProjectUsers, UserInvites } from "@client/graphql/types.generated";
 import { getSessionProject } from "@server/session";
 import { NextPageContext } from "next";
-import { getSession } from "next-auth/client";
+import { getSession } from "next-auth/react";
 import React, { useState } from "react";
 import { FiPlus } from "react-icons/fi";
 

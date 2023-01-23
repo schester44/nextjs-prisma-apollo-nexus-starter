@@ -42,7 +42,7 @@ type ProjectUsers {
 
 input ProjectUsersProjectIdUserIdCompoundUniqueInput {
   projectId: String!
-  userId: Int!
+  userId: String!
 }
 
 input ProjectUsersWhereUniqueInput {
@@ -69,7 +69,7 @@ input SubscriptionWhereUniqueInput {
 
 type User {
   email: String
-  id: Int!
+  id: String!
   name: String
   projects(after: ProjectUsersWhereUniqueInput, before: ProjectUsersWhereUniqueInput, first: Int, last: Int): [ProjectUsers!]!
 }

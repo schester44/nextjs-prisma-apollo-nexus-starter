@@ -1,9 +1,11 @@
 import Head from "next/head";
 import Link from "next/link";
-import { useSession } from "next-auth/client";
+import { useSession } from "next-auth/react";
 
 function Home() {
-  const [session, loading] = useSession();
+  const { data: session, status } = useSession();
+  const loading = status === "loading";
+
   if (loading) return <div>LOADING</div>;
 
   return (
@@ -23,15 +25,15 @@ function Home() {
           <h1 className="text-xl font-black">LOGO</h1>
 
           <div>
-            <Link href="/pricing">
-              <a className="mr-3 text-gray-600 hover:text-gray-700">Pricing</a>
+            <Link href="/pricing" className="mr-3 text-gray-600 hover:text-gray-700">
+              Pricing
             </Link>
-            <Link href="/docs">
-              <a className="mr-3 text-gray-600 hover:text-gray-700">Docs</a>
+            <Link href="/docs" className="mr-3 text-gray-600 hover:text-gray-700">
+              Docs
             </Link>
             {!session ? (
-              <Link href="/api/auth/signin">
-                <a className="mr-3 text-gray-600 hover:text-gray-700">Sign In</a>
+              <Link href="/api/auth/signin" className="mr-3 text-gray-600 hover:text-gray-700">
+                Sign In
               </Link>
             ) : (
               <Link href="/app">
