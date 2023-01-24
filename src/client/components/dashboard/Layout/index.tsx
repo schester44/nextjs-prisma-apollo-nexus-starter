@@ -4,17 +4,17 @@ import { useEffect } from "react";
 import SideNav from "../SideNav";
 import { ProjectUsers, useGetCurrentUserQuery, User } from "@client/graphql/types.generated";
 import ActionBar from "../ActionBar";
-import { useActiveProject } from "@client/hooks/useActiveProject";
+import { useRouter } from "next/router";
 
 type LayoutProps = { children: React.ReactNode };
 
 const Layout = ({ children }: LayoutProps) => {
   const { data: session, status } = useSession();
+  const { query } = useRouter();
 
   const loading = status === "loading";
 
   const [{ data, fetching }] = useGetCurrentUserQuery();
-  const activeProject = useActiveProject();
 
   useEffect(() => {
     if (loading) return;
@@ -28,19 +28,17 @@ const Layout = ({ children }: LayoutProps) => {
 
   if (!session || !data?.currentUser?.projects) return null;
 
+  const activeProject = data.currentUser.projects.find(
+    (project) => project.project.id === query.id
+  )?.project;
+
   return (
     <div className="w-full h-full flex">
       <SideNav
-        activeProject={activeProject?.project}
+        activeProject={activeProject}
         projects={data.currentUser.projects as ProjectUsers[]}
       />
-      <div className="flex-1  flex flex-col">
-        <ActionBar user={data.currentUser as User} />
-
-        <div className="flex-1">
-          <div className="h-full p-4">{children}</div>
-        </div>
-      </div>
+      <div className="flex-1 flex flex-col h-full">{children}</div>
     </div>
   );
 };

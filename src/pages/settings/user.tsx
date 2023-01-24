@@ -1,5 +1,4 @@
 import Layout from "@client/components/dashboard/Layout";
-import SettingsBreadcrumb from "@client/components/dashboard/SettingsBreadcrumb";
 import { useGetCurrentUserQuery } from "@client/graphql/types.generated";
 import React from "react";
 
@@ -12,8 +11,6 @@ const User = () => {
     <Layout>
       <div className="p-4">
         <div className="mb-3">
-          <SettingsBreadcrumb path={[{ title: "Profile" }]} />
-
           <h1 className="text-2xl font-bold mt-4">Profile</h1>
 
           <div>

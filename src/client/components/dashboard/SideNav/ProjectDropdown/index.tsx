@@ -1,25 +1,19 @@
 import React, { Fragment, useState } from "react";
 
-import {
-  Project,
-  ProjectUsers,
-  useChangeSessionProjectMutation,
-} from "@client/graphql/types.generated";
+import { Project, ProjectUsers } from "@client/graphql/types.generated";
 
 import { AiOutlineCloseCircle, AiOutlinePlusSquare } from "react-icons/ai";
-import Router from "next/router";
 
 import { Menu, Transition } from "@headlessui/react";
 import classNames from "classnames";
 import { signOut } from "next-auth/react";
 import CreateProjectModal from "../../CreateProjectModal";
 import EditProjectModal from "../../EditProjectModal";
+import Router, { useRouter } from "next/router";
 
 const ProjectDropdown = ({
   projects,
   activeProject,
-  onEdit,
-  onCreate,
   children,
 }: {
   activeProject: Project;
@@ -28,18 +22,9 @@ const ProjectDropdown = ({
   onEdit: (p: Project) => void;
   children: (args: { open: boolean }) => React.ReactNode;
 }) => {
-  const [{ fetching, data }, updateSession] = useChangeSessionProjectMutation();
-
+  const router = useRouter();
   const [isCreateModalVisible, setCreateModalVisibility] = useState(false);
   const [editingProject, setEditingProject] = useState<Project | undefined>(undefined);
-
-  function handleProjectSelection(project: Project) {
-    updateSession({ projectId: project.id }).then(({ data }) => {
-      if (data?.changeSessionProject) {
-        Router.reload();
-      }
-    });
-  }
 
   return (
     <div>
@@ -90,7 +75,8 @@ const ProjectDropdown = ({
                                 )}
                                 onClick={() => {
                                   if (isSelected) return;
-                                  handleProjectSelection(project);
+
+                                  Router.push(router.pathname.replace("[id]", project.id));
                                 }}
                               >
                                 <div className="flex items-center">

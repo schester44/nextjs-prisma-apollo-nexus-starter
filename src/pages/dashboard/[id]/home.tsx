@@ -2,11 +2,10 @@ import { NextPageContext } from "next";
 import React from "react";
 import { getSession } from "next-auth/react";
 import prisma from "@db/prisma/client";
-import { ProjectLayout } from "@client/components/dashboard/Layout/ProjectLayout";
-import { Project } from "@prisma/client";
+import Layout from "@client/components/dashboard/Layout";
 
-const AppIndex = ({ project }: { project: Project }) => {
-  return <ProjectLayout project={project}>hello world</ProjectLayout>;
+const AppIndex = () => {
+  return <Layout>hello world</Layout>;
 };
 
 export async function getServerSideProps({ req, res, query }: NextPageContext) {

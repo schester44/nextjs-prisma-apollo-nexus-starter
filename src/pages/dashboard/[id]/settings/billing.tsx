@@ -8,14 +8,14 @@ import {
   useCreateCheckoutSessionMutation,
 } from "@client/graphql/types.generated";
 import { Project } from "@prisma/client";
-import { getSessionProject } from "src/server/session";
+import { getActiveProject } from "src/server/session";
 import { loadStripe } from "@stripe/stripe-js";
 import { NextPageContext } from "next";
 import { useRouter } from "next/router";
 import React from "react";
 import prisma from "src/db/prisma/client";
 import { plans } from "@server/services/stripe/plans";
-import SettingsBreadcrumb from "@client/components/dashboard/SettingsBreadcrumb";
+import { getSession } from "next-auth/react";
 
 function BillingButton({ children, projectId }: { children: React.ReactNode; projectId: string }) {
   const [, createPortalSession] = useCreateBillingPortalSessionMutation();
@@ -98,8 +98,6 @@ const settings = ({
     <Layout>
       <div className="p-4">
         <div className="mb-3">
-          <SettingsBreadcrumb path={[{ title: "Billing & plan" }]} />
-
           <h1 className="text-2xl font-bold mt-4">Billing</h1>
           <p className="text-sm text-gray-600">Billing & plan details for {project.name}</p>
         </div>
@@ -143,15 +141,26 @@ function replacer(_: any, value: any) {
   return value;
 }
 
-export async function getServerSideProps({ req }: NextPageContext) {
-  const userProject = await getSessionProject(req);
+export async function getServerSideProps({ req, query }: NextPageContext) {
+  const session = await getSession({ req });
+
+  if (!session) {
+    return {
+      redirect: {
+        destination: "/auth/signin",
+        permanent: false,
+      },
+    };
+  }
+
+  const activeProject = await getActiveProject(session?.user.id, query);
 
   let subscription;
 
-  if (userProject) {
+  if (activeProject) {
     subscription = await prisma.subscription.findFirst({
       where: {
-        projectId: userProject.projectId,
+        projectId: activeProject.id,
       },
     });
   }
@@ -159,7 +168,7 @@ export async function getServerSideProps({ req }: NextPageContext) {
   return {
     props: {
       subscription: JSON.stringify(subscription, replacer),
-      project: userProject?.project || null,
+      project: activeProject,
     },
   };
 }

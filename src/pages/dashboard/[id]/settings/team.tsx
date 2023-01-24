@@ -1,9 +1,8 @@
 import Button from "@client/components/dashboard/Button";
 import Layout from "@client/components/dashboard/Layout";
 import NewMembersModal from "@client/components/dashboard/NewMembersModal";
-import SettingsBreadcrumb from "@client/components/dashboard/SettingsBreadcrumb";
 import { Project, ProjectUsers, UserInvites } from "@client/graphql/types.generated";
-import { getSessionProject } from "@server/session";
+import { getActiveProject } from "@server/session";
 import { NextPageContext } from "next";
 import { getSession } from "next-auth/react";
 import React, { useState } from "react";
@@ -35,8 +34,6 @@ const Team = ({
       />
 
       <div className="p-4">
-        <SettingsBreadcrumb path={[{ title: "Team" }]} />
-
         {!!invitedUsers.length && (
           <div className="mt-4 mb-8 pb-4 border-b border-gray-200">
             <h1 className="text-2xl pb-2 mb-4 font-bold border-b border-gray-200">Invited</h1>
@@ -101,26 +98,39 @@ const Team = ({
   );
 };
 
-export async function getServerSideProps({ req, res }: NextPageContext) {
-  const sessionProject = await getSessionProject(req);
+export async function getServerSideProps({ req, res, query }: NextPageContext) {
   const session = await getSession({ req });
 
+  const activeProject = await getActiveProject(session?.user.id, query);
+
   const users = await prisma.projectUsers.findMany({
-    where: { projectId: sessionProject?.projectId },
+    where: { projectId: activeProject?.id },
     include: { user: true },
   });
 
   const invitedUsers = await prisma.userInvites.findMany({
-    where: { projectId: sessionProject?.projectId },
+    where: { projectId: activeProject?.id },
     include: { user: true, invitedBy: true },
   });
 
+  console.log(session?.user.email);
+
   return {
     props: {
-      project: sessionProject?.project,
+      project: activeProject,
       userEmail: session?.user?.email,
-      users,
-      invitedUsers,
+      users: users.map((u) => {
+        delete u.createdAt;
+        delete u.user.emailVerified;
+
+        return u;
+      }),
+      invitedUsers: invitedUsers.map((u) => {
+        delete u.createdAt;
+        delete u.invitedBy.emailVerified;
+
+        return u;
+      }),
     },
   };
 }
