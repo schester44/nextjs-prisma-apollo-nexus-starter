@@ -33,9 +33,11 @@ export const changeSessionProject = mutationField("changeSessionProject", {
       throw new UserInputError("Project does not exist");
     }
 
+    console.log({ p: ctx.session });
+
     await ctx.prisma.session.update({
       where: {
-        accessToken: ctx.session?.accessToken,
+        id: ctx.session?.id,
       },
       data: {
         currentProject: projectId,

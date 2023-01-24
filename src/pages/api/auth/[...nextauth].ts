@@ -1,11 +1,11 @@
-import NextAuth, { User } from "next-auth";
+import NextAuth, { Session, User } from "next-auth";
 import EmailProvider from "next-auth/providers/email";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import prisma from "src/db/prisma/client";
 import { JWT } from "next-auth/jwt";
 import moniker from "moniker";
 
-async function generateProjectAndAssignToUser(user: User & { id: number }) {
+async function generateProjectAndAssignToUser(user: User) {
   const names = moniker.generator([moniker.adjective, moniker.noun], { glue: " " });
 
   const project = await prisma.project.create({
@@ -25,20 +25,9 @@ async function generateProjectAndAssignToUser(user: User & { id: number }) {
   return project;
 }
 
-const emailServerConfig = {
-  host: process.env.EMAIL_SERVER_HOST || "",
-  port: Number(process.env.EMAIL_SERVER_PORT || 587),
-  auth: {
-    user: process.env.EMAIL_SERVER_USER || "",
-    pass: process.env.EMAIL_SERVER_PASSWORD || "",
-  },
-};
-
 export default NextAuth({
   callbacks: {
-    // FIXME:
-    //@ts-ignore
-    jwt(token: JWT, user: User & { id: number }) {
+    jwt({ token, user }) {
       if (user) {
         token.id = user.id;
       }
@@ -46,45 +35,8 @@ export default NextAuth({
       return token;
     },
 
-    // FIXME:
-    //@ts-ignore
-    async session(session: Session & { currentProject: string }, user: User & { id: number }) {
+    async session({ user, session }) {
       session.user.id = user.id;
-
-      console.log("SESSION", session, user);
-
-      // TOOD: session.accessToken doesn't exist so need to find the session a different way.
-
-      const userSession = await prisma.session.findFirst({
-        where: {
-          accessToken: session.accessToken,
-        },
-      });
-
-      session.currentProject = userSession?.currentProject;
-
-      if (!session.currentProject) {
-        const projects = await prisma.projectUsers.findFirst({ where: { userId: user.id } });
-
-        if (projects) {
-          session.currentProject = projects.projectId;
-        } else {
-          const project = await generateProjectAndAssignToUser(user);
-
-          session.currentProject = project.id;
-        }
-
-        if (userSession) {
-          await prisma.session.update({
-            data: {
-              currentProject: session.currentProject,
-            },
-            where: {
-              id: userSession.id,
-            },
-          });
-        }
-      }
 
       return Promise.resolve(session);
     },
@@ -92,7 +44,7 @@ export default NextAuth({
   // Configure one or more authentication providers #ref https://next-auth.js.org/providers/email
   providers: [
     EmailProvider({
-      server: emailServerConfig,
+      server: process.env.EMAIL_SERVER,
       from: process.env.EMAIL_FROM,
     }),
   ],

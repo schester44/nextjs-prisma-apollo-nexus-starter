@@ -1,4 +1,5 @@
 import Layout from "@client/components/dashboard/Layout";
+import { ProjectLayout } from "@client/components/dashboard/Layout/ProjectLayout";
 import Link from "next/link";
 import React from "react";
 import { FiUser, FiCreditCard, FiUsers } from "react-icons/fi";
@@ -18,7 +19,7 @@ function MenuItem({ href, icon, title }: { href: string; icon: JSX.Element; titl
 
 const Settings = () => {
   return (
-    <Layout>
+    <ProjectLayout project={{ id: "123", name: "hello" }}>
       <div className="p-4">
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-bold">Settings</h1>
@@ -43,7 +44,7 @@ const Settings = () => {
           icon={<FiUsers className="text-gray-400" />}
         />
       </div>
-    </Layout>
+    </ProjectLayout>
   );
 };
 

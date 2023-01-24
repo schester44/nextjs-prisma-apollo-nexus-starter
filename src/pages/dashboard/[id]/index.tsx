@@ -21,7 +21,9 @@ const AppIndex = ({ user, project }: { user: User; project: Project | undefined 
   );
 };
 
-export async function getServerSideProps({ req, res }: NextPageContext) {
+export async function getServerSideProps({ req, res, params }: NextPageContext) {
+  console.log({ params });
+
   const session = await getSession({ req });
 
   if (!session) {

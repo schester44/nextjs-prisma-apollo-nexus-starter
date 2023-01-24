@@ -36,7 +36,7 @@ function Home() {
                 Sign In
               </Link>
             ) : (
-              <Link href="/app">
+              <Link href="/dashboard">
                 <button className="bg-gray-400 rounded px-2 py-1 text-sm cursor hover:bg-gray-600">
                   Dashboard
                 </button>
